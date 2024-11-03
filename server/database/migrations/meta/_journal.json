@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1730559007003,
-      "tag": "0000_plain_thena",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1730563407145,
-      "tag": "0001_easy_whizzer",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1730565545402,
-      "tag": "0002_perpetual_hellion",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1730574564060,
-      "tag": "0003_brave_gamma_corps",
+      "when": 1730655344924,
+      "tag": "0000_mushy_xavin",
       "breakpoints": true
     }
   ]
