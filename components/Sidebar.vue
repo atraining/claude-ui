@@ -1,0 +1,51 @@
+<template>
+    <!-- Sidebar -->
+    <div class="w-64 bg-white border-r border-gray-200 p-4">
+        <UButton icon="i-heroicons-plus-circle" variant="outline" class="w-full justify-start mb-4" @click="openModal">
+            New Chat
+        </UButton>
+        <UScrollbar class="h-[calc(100vh-8rem)]">
+            <div class="space-y-2">
+                <div v-for="thread in threads" :key="thread.id" class="flex items-center gap-2 group">
+                    <UButton variant="ghost" block class="flex-1" @click="openThread(thread.id)">
+                        {{ thread.name }}
+                    </UButton>
+
+                    <div class="hidden group-hover:flex gap-1">
+                        <UButton size="xs" color="gray" variant="ghost" icon="i-heroicons-pencil-square"
+                            @click="editThread(thread.id)" />
+                        <UButton size="xs" color="red" variant="ghost" icon="i-heroicons-trash"
+                            @click="deleteThread(thread.id)" />
+                    </div>
+                </div>
+            </div>
+        </UScrollbar>
+    </div>
+</template>
+<script setup>
+const { isModalOpen, openModal } = useCustomModal()
+
+const { threads } = useApp()
+
+onMounted(async () => {
+    threads.value = await $fetch('/api/threads')
+})
+
+
+const editThread = (id) => {
+    // Handle editing thread
+}
+
+const deleteThread = (id) => {
+    // Handle deleting thread
+    $fetch('/api/threads/' + id, {
+        method: 'DELETE'
+    })
+        .then(() => {
+            threads.value = threads.value.filter(thread => thread.id !== id)
+        })
+}
+const openThread = (threadId) => {
+    navigateTo('/threads/' + threadId)
+}
+</script>
