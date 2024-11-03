@@ -1,5 +1,6 @@
 <template>
-    <div class="flex h-screen bg-gray-100">
+    <!-- Use dark: prefix for dark mode variants -->
+    <div class="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
         <Sidebar></Sidebar>
         <!-- Main Chat Area -->
         <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
@@ -8,9 +9,9 @@
                 <div v-for="message in messages" 
                      :key="message.id" 
                      :class="[
-                    'flex mb-4 max-w-full',
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
-                ]">
+                        'flex mb-4 max-w-full',
+                        message.role === 'user' ? 'justify-end' : 'justify-start'
+                     ]">
                     <div :class="[
                         'flex items-start max-w-[85%]',
                         message.role === 'user' ? 'flex-row-reverse' : ''
@@ -24,8 +25,8 @@
                         <div :class="[
                             'mx-2 px-4 py-2 rounded-lg break-words',
                             message.role === 'user'
-                                ? 'bg-primary text-white'
-                                : 'bg-gray-200'
+                                ? 'bg-primary text-white dark:bg-primary-600'
+                                : 'bg-gray-200 dark:bg-gray-700 dark:text-gray-100'
                         ]" 
                         v-html="$mdRenderer.render(message.content)">
                         </div>
@@ -34,12 +35,12 @@
             </div>
 
             <!-- Input Area - Fixed at bottom -->
-            <div class="shrink-0 p-4">
+            <div class="shrink-0 p-4 border-t border-gray-200 dark:border-gray-700">
                 <form @submit.prevent="handleSendMessage" class="flex space-x-2">
                     <UTextarea 
                         v-model="inputMessage" 
                         placeholder="Type your message here..." 
-                        class="flex-grow min-w-0"
+                        class="flex-grow min-w-0 bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                         :rows="2"
                         :auto-size="true"
                         :max-rows="4">
@@ -58,7 +59,6 @@
         <CreateThreadModal></CreateThreadModal>
     </div>
 </template>
-
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import Sidebar from '~/components/Sidebar.vue';
