@@ -1,13 +1,13 @@
 <template>
     <!-- Sidebar -->
     <div class="w-64 bg-white border-r border-gray-200 p-4">
-        <UButton icon="i-heroicons-plus-circle" variant="outline" class="w-full justify-start mb-4" @click="openModal">
+        <UButton icon="i-heroicons-plus-circle" class="w-full justify-start mb-4" @click="openModal">
             New Chat
         </UButton>
         <UScrollbar class="h-[calc(100vh-8rem)]">
             <div class="space-y-2">
                 <div v-for="thread in threads" :key="thread.id" class="flex items-center gap-2 group">
-                    <UButton variant="ghost" block class="flex-1" @click="openThread(thread.id)">
+                    <UButton variant="soft" block class="flex-1" @click="openThread(thread.id)">
                         {{ thread.name }}
                     </UButton>
 
