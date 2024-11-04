@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1730655344924,
-      "tag": "0000_mushy_xavin",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1730716735239,
-      "tag": "0001_nostalgic_sentinels",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1730726706476,
-      "tag": "0002_brief_lilith",
+      "when": 1730732713354,
+      "tag": "0000_eminent_overlord",
       "breakpoints": true
     }
   ]
