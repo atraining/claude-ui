@@ -27,10 +27,10 @@
             </div>
 
             <!-- Input Area with File Attachments -->
-            <div class="shrink-0 p-4">
+            <div class="shrink-0 pb-4 px-4">
                 <!-- File Attachments Display -->
-                <div v-if="attachedFiles.length" class="mb-2 p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                    <div v-for="file in attachedFiles" :key="file.name" class="flex items-center gap-2 mb-1">
+                <div v-if="attachedFiles.length" class="mb-2 flex flex-wrap">
+                    <div v-for="file in attachedFiles" :key="file.name" class=" p-2 mr-2 flex items-center gap-2 mb-1 bg-gray-50 dark:bg-gray-800 rounded">
                         <UCheckbox v-model="file.selected" />
                         <UBadge size="sm" variant="ghost">{{ file.name }}</UBadge>
                         <UBadge size="sm" variant="solid">{{ file.tokens }} tokens</UBadge>

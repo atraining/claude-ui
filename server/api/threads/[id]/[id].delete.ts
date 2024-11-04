@@ -7,6 +7,8 @@ export default defineEventHandler(async (event) => {
         const stmt = await db.prepare("DELETE FROM threads WHERE id = ?").bind(id).run();
         // delete from messages where thread_id = ?
         const stmt2 = await db.prepare("DELETE FROM messages WHERE thread_id = ?").bind(id).run();
+        // delete from files where thread_id = ?
+        const stmt3 = await db.prepare("DELETE FROM files WHERE thread_id = ?").bind(id).run();
         return stmt.changes;
     } catch (error) {
         console.error("Error in threads.delete handler:", error);
