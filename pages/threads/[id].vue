@@ -6,49 +6,35 @@
         <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
             <!-- Messages Area with native scrolling -->
             <div class="flex-1 overflow-y-auto overflow-x-hidden p-4">
-                <div v-for="message in messages" 
-                     :key="message.id" 
-                     :class="[
-                        'flex mb-4 max-w-full',
-                        message.role === 'user' ? 'justify-end' : 'justify-start'
-                     ]">
+                <div v-for="message in messages" :key="message.id" :class="[
+                    'flex mb-4 max-w-full',
+                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                ]">
                     <div :class="[
                         'flex items-start max-w-[85%]',
                         message.role === 'user' ? 'flex-row-reverse' : ''
                     ]">
-                        <UAvatar 
-                            :src="message.role === 'user' ? '/user-avatar.png' : '/assistant-avatar.png'"
-                            :alt="message.role === 'user' ? 'User' : 'AI'" 
-                            size="sm" 
-                            class="flex-shrink-0">
+                        <UAvatar :src="message.role === 'user' ? '/user-avatar.png' : '/assistant-avatar.png'"
+                            :alt="message.role === 'user' ? 'User' : 'AI'" size="sm" class="flex-shrink-0">
                         </UAvatar>
                         <div :class="[
                             'mx-2 px-4 py-2 rounded-lg break-words',
                             message.role === 'user'
                                 ? 'bg-primary text-white dark:bg-primary-600'
                                 : 'bg-gray-200 dark:bg-gray-700 dark:text-gray-100'
-                        ]" 
-                        v-html="$mdRenderer.render(message.content)">
+                        ]" v-html="$mdRenderer.render(message.content)">
                         </div>
                     </div>
                 </div>
             </div>
-
             <!-- Input Area - Fixed at bottom -->
-            <div class="shrink-0 p-4 border-t border-gray-200 dark:border-gray-700">
+            <div class="shrink-0 p-4">
                 <form @submit.prevent="handleSendMessage" class="flex space-x-2">
-                    <UTextarea 
-                        v-model="inputMessage" 
-                        placeholder="Type your message here..." 
+                    <UTextarea v-model="inputMessage" placeholder="Type your message here..."
                         class="flex-grow min-w-0 bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-                        :rows="2"
-                        :auto-size="true"
-                        :max-rows="4">
+                        :rows="2" :auto-size="true" :max-rows="4">
                     </UTextarea>
-                    <UButton 
-                        type="submit" 
-                        color="primary" 
-                        :icon="sendIcon"
+                    <UButton type="submit" color="primary" icon="i-heroicons-paper-airplane-20-solid"
                         class="flex-shrink-0">
                         Send
                     </UButton>
@@ -71,10 +57,6 @@ const inputMessage = ref('')
 onMounted(async () => {
     messages.value = await $fetch('/api/messages/' + route.params.id)
 })
-
-const userMessages = computed(() =>
-    messages.value.filter(m => m.role === 'user')
-)
 
 const handleSendMessage = async () => {
     if (inputMessage.value.trim() !== '') {
@@ -101,9 +83,6 @@ const handleSendMessage = async () => {
         })
     }
 }
-
-// Icon for send button
-const sendIcon = 'i-heroicons-paper-airplane-20-solid'
 </script>
 
 <style scoped>

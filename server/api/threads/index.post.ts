@@ -1,12 +1,12 @@
 export default defineEventHandler(async (event) => {
   try {
     const db = hubDatabase();
-    const { name, systemMessage } = await readBody(event);
+    const { name, systemMessage, temperature } = await readBody(event);
     const stmt = await db
       .prepare(
-        "INSERT INTO threads (name, system_message, created_at) VALUES (?, ?, ?)"
+        "INSERT INTO threads (name, system_message, created_at , temperature) VALUES (?, ?, ? , ?)"
       )
-      .bind(name, systemMessage, Date.now())
+      .bind(name, systemMessage, Date.now(), temperature)
       .run();
     return stmt.meta;
   } catch (error) {

@@ -1,10 +1,11 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer , real } from 'drizzle-orm/sqlite-core'
 
 export const threads = sqliteTable('threads', {
     id: integer('id').primaryKey(),
     name: text('name'),
     systemMessage: text('system_message'),
     createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+    temperature: real('temperature').default(0.5),
 })
 
 export const messages = sqliteTable('messages', {

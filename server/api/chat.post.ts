@@ -31,25 +31,36 @@ export default defineEventHandler(async (event: H3Event) => {
 
     const body = await readBody(event);
     const messages = validateMessages(body.messages);
-    const thread = await db.prepare("SELECT * FROM threads WHERE id = ?").bind(body.threadId).run();
+    const thread = await db
+      .prepare("SELECT * FROM threads WHERE id = ?")
+      .bind(body.threadId)
+      .run();
 
     await db
       .prepare(
         "INSERT INTO messages (content, role , created_at , thread_id) VALUES ( ?, 'user' , ?, ?)"
       )
-      .bind(...[messages[messages.length - 1].content, Date.now() , body.threadId])
+      .bind(
+        ...[messages[messages.length - 1].content, Date.now(), body.threadId]
+      )
       .run();
 
     // Process messages
     const processedMessages = preprocessMessages(messages);
 
     // Make API call
-    const response = await anthropic.messages.create({
+    const response = await anthropic.beta.promptCaching.messages.create({
       model: MODEL,
       max_tokens: MAX_TOKENS,
       messages: processedMessages,
-      temperature: TEMPERATURE,
-      system: thread.results[0].system_message || 'You are a helpfull assistant',
+      temperature: thread.results[0].temperature || TEMPERATURE,
+      system: [
+        {
+          type: "text",
+          text: thread.results[0].system_message || "You are a helpfull assistant",
+          cache_control: { type: "ephemeral" },
+        },
+      ],
     });
 
     await db

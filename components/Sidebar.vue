@@ -1,17 +1,17 @@
 <template>
-    <!-- Sidebar -->
     <div class="w-64 dark:bg-gray-900 bg-white border-r border-gray-200 p-4">
         <div class="flex align-center justify-between mb-4">
-            <UButton icon="i-heroicons-plus-circle" 
-            class="justify-start" @click="openModal">
-                New Chat
+            <UButton icon="i-heroicons-plus-circle" class="justify-start" @click="openModal">
+                New Agent
             </UButton>
             <ColorButton />
         </div>
         <UScrollbar class="h-[calc(100vh-8rem)]">
             <div class="space-y-2">
                 <div v-for="thread in threads" :key="thread.id" class="flex items-center gap-2 group">
-                    <UButton variant="soft" block class="flex-1" @click="openThread(thread.id)">
+                    <UButton variant="soft" block class="flex-1"
+                        :class="{ 'bg-primary-500 text-white dark:bg-gray-800 dark:text-white': isSelected(thread.id) }"
+                        @click="openThread(thread.id)">
                         {{ thread.name }}
                     </UButton>
 
@@ -26,11 +26,16 @@
         </UScrollbar>
     </div>
 </template>
+
 <script setup>
 const { isModalOpen, openModal } = useCustomModal()
 
 const { threads } = useApp()
+const route = useRoute()
 
+const isSelected = (threadId) => {
+    return route.params.id === threadId.toString()
+}
 onMounted(async () => {
     threads.value = await $fetch('/api/threads')
 })
