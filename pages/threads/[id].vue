@@ -3,7 +3,7 @@
         <Sidebar></Sidebar>
         <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
             <!-- Messages Area with native scrolling -->
-            <div class="flex-1 overflow-y-auto overflow-x-hidden p-4">
+            <div ref="messagesContainer" class="flex-1 overflow-y-auto overflow-x-hidden p-4">
                 <div v-for="message in messages" :key="message.id" :class="[
                     'flex mb-4 max-w-full',
                     message.role === 'user' ? 'justify-end' : 'justify-start'
@@ -73,6 +73,7 @@ const { getThread } = useApp()
 const route = useRoute()
 const messages = ref([])
 const inputMessage = ref('')
+const messagesContainer = ref(null)
 
 
 
@@ -113,11 +114,23 @@ const removeFile = (fileToRemove) => {
     attachedFiles.value = attachedFiles.value.filter(file => file !== fileToRemove)
 }
 
+watch(messages, () => {
+  nextTick(() => {
+    if (messagesContainer.value) {
+      messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+    }
+  })
+}, { deep: true })
 
 onMounted(async () => {
-    messages.value = await $fetch('/api/messages/' + route.params.id)
-    const thread = await getThread(route.params.id)
-    attachedFiles.value = thread.files
+    try {
+        messages.value = await $fetch('/api/messages/' + route.params.id)
+        const thread = await getThread(route.params.id)
+        attachedFiles.value = thread?.files ?? [] // Using nullish coalescing
+    } catch (error) {
+        console.error('Error loading thread:', error)
+        attachedFiles.value = [] // Ensure attachedFiles is always initialized
+    }
 })
 
 const handleSendMessage = async () => {
