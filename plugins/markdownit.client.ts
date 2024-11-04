@@ -1,6 +1,6 @@
 import markdownit from "markdown-it";
 import hljs from 'highlight.js' // https://highlightjs.org
-import 'highlight.js/styles/github-dark-dimmed.min.css';
+import 'highlight.js/styles/github-dark.min.css';
 
 export default defineNuxtPlugin(() => {
   const md = markdownit({

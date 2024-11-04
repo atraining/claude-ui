@@ -31,6 +31,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
     const body = await readBody(event);
     const messages = validateMessages(body.messages);
+
     const thread = await db
       .prepare("SELECT * FROM threads WHERE id = ?")
       .bind(body.threadId)
@@ -48,19 +49,46 @@ export default defineEventHandler(async (event: H3Event) => {
     // Process messages
     const processedMessages = preprocessMessages(messages);
 
+    let systemMessage = [
+      {
+        type: "text",
+        text:
+          thread.results[0].system_message || "You are a helpfull assistant",
+        cache_control: { type: "ephemeral" },
+      },
+    ];
+
+    if (body.selectedFiles && body.selectedFiles.length > 0) {
+      // retreive text from files
+      const files = await db
+        .prepare(
+          ` SELECT 
+                  f.name,
+                  f.text
+              FROM files f
+              WHERE f.thread_id = ?
+              AND f.id IN (?)`
+        )
+        .bind(...[body.threadId, ...body.selectedFiles])
+        .run();
+
+      for (let f = 0; f < files.results.length; f++) {
+        const element = files.results[f];
+        systemMessage.push({
+          type: "text",
+          text: element.text,
+          cache_control: { type: "ephemeral" },
+        });
+      }
+    }
+
     // Make API call
     const response = await anthropic.beta.promptCaching.messages.create({
       model: MODEL,
       max_tokens: MAX_TOKENS,
       messages: processedMessages,
       temperature: thread.results[0].temperature || TEMPERATURE,
-      system: [
-        {
-          type: "text",
-          text: thread.results[0].system_message || "You are a helpfull assistant",
-          cache_control: { type: "ephemeral" },
-        },
-      ],
+      system: systemMessage,
     });
 
     await db

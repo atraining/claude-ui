@@ -1,8 +1,6 @@
 <template>
-    <!-- Use dark: prefix for dark mode variants -->
     <div class="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
         <Sidebar></Sidebar>
-        <!-- Main Chat Area -->
         <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
             <!-- Messages Area with native scrolling -->
             <div class="flex-1 overflow-y-auto overflow-x-hidden p-4">
@@ -27,21 +25,42 @@
                     </div>
                 </div>
             </div>
-            <!-- Input Area - Fixed at bottom -->
+
+            <!-- Input Area with File Attachments -->
             <div class="shrink-0 p-4">
-                <form @submit.prevent="handleSendMessage" class="flex space-x-2">
-                    <UTextarea v-model="inputMessage" placeholder="Type your message here..."
-                        class="flex-grow min-w-0 bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-                        :rows="2" :auto-size="true" :max-rows="4">
-                    </UTextarea>
-                    <UButton type="submit" color="primary" icon="i-heroicons-paper-airplane-20-solid"
-                        class="flex-shrink-0">
-                        Send
-                    </UButton>
+                <!-- File Attachments Display -->
+                <div v-if="attachedFiles.length" class="mb-2 p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                    <div v-for="file in attachedFiles" :key="file.name" class="flex items-center gap-2 mb-1">
+                        <UCheckbox v-model="file.selected" />
+                        <UBadge size="sm" variant="ghost">{{ file.name }}</UBadge>
+                        <UBadge size="sm" variant="solid">{{ file.tokens }} tokens</UBadge>
+                        <UButton size="xs" color="red" variant="ghost" icon="i-heroicons-x-mark"
+                            @click="removeFile(file)" />
+                    </div>
+                </div>
+
+                <form @submit.prevent="handleSendMessage" class="flex flex-col gap-2">
+                    <div class="flex gap-2">
+                        <UTextarea v-model="inputMessage" placeholder="Type your message here..."
+                            class="flex-grow min-w-0 bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+                            :rows="2" :auto-size="true" :max-rows="4">
+                        </UTextarea>
+                        <div class="flex flex-col gap-2">
+                            <UButton type="button" color="gray" icon="i-heroicons-paper-clip" class="flex-shrink-0"
+                                @click="triggerFileInput">
+                            </UButton>
+                            <UButton type="submit" color="primary" icon="i-heroicons-paper-airplane-20-solid"
+                                class="flex-shrink-0">
+                                Send
+                            </UButton>
+                        </div>
+                    </div>
                 </form>
+
+                <!-- Hidden file input -->
+                <input type="file" ref="fileInput" @change="handleFileSelect" multiple class="hidden">
             </div>
         </div>
-
         <CreateThreadModal></CreateThreadModal>
     </div>
 </template>
@@ -49,13 +68,56 @@
 import { ref, computed, onMounted } from 'vue'
 import Sidebar from '~/components/Sidebar.vue';
 const { $mdRenderer } = useNuxtApp()
+const { getThread } = useApp()
 
 const route = useRoute()
 const messages = ref([])
 const inputMessage = ref('')
 
+
+
+const fileInput = ref(null)
+const attachedFiles = ref([])
+
+const triggerFileInput = () => {
+    fileInput.value.click()
+}
+
+// get array of ids of selected files
+const selectedFiles = computed(() => {
+    return attachedFiles.value.filter(file => file.selected).map(file => file.id)
+})
+
+const handleFileSelect = (event) => {
+    const files = Array.from(event.target.files)
+    files.forEach(async (file) => {
+
+        let formData = new FormData()
+        formData.append('file', file)
+        const fileReq = await $fetch(`/api/threads/${route.params.id}/files`, {
+            method: 'post',
+            body: formData
+        })
+
+        attachedFiles.value.push({
+            file,
+            name: file.name,
+            selected: true,
+            id : fileReq.last_row_id
+        })
+    })
+    fileInput.value.value = '' // Reset file input
+}
+
+const removeFile = (fileToRemove) => {
+    attachedFiles.value = attachedFiles.value.filter(file => file !== fileToRemove)
+}
+
+
 onMounted(async () => {
     messages.value = await $fetch('/api/messages/' + route.params.id)
+    const thread = await getThread(route.params.id)
+    attachedFiles.value = thread.files
 })
 
 const handleSendMessage = async () => {
@@ -72,7 +134,8 @@ const handleSendMessage = async () => {
             method: 'POST',
             body: JSON.stringify({
                 messages: messages.value,
-                threadId: route.params.id
+                threadId: route.params.id,
+                selectedFiles : selectedFiles.value
             })
         })
 

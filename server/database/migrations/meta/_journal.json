@@ -15,6 +15,13 @@
       "when": 1730716735239,
       "tag": "0001_nostalgic_sentinels",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1730726706476,
+      "tag": "0002_brief_lilith",
+      "breakpoints": true
     }
   ]
 }
