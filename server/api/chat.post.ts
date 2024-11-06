@@ -60,16 +60,17 @@ export default defineEventHandler(async (event: H3Event) => {
 
     if (body.selectedFiles && body.selectedFiles.length > 0) {
       // retreive text from files
+      const placeholders = body.selectedFiles.map(() => "?").join(",");
       const files = await db
         .prepare(
           ` SELECT 
-                  f.name,
-                  f.text
-              FROM files f
-              WHERE f.thread_id = ?
-              AND f.id IN (?)`
+              f.name,
+              f.text
+            FROM files f
+            WHERE f.thread_id = ?
+            AND f.id IN (${placeholders})`
         )
-        .bind(...[body.threadId, ...body.selectedFiles])
+        .bind(body.threadId, ...body.selectedFiles)
         .run();
 
       for (let f = 0; f < files.results.length; f++) {
