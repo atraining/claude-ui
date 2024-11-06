@@ -173,4 +173,7 @@ const handleSendMessage = async () => {
     max-width: 100%;
     overflow-x: auto;
 }
+
+
+
 </style>
