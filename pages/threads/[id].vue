@@ -43,7 +43,7 @@
                     <div class="flex gap-2">
                         <UTextarea v-model="inputMessage" placeholder="Type your message here..."
                             class="flex-grow min-w-0 bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-                            :rows="2" :auto-size="true" :max-rows="4">
+                            :rows="3" :auto-size="true" :max-rows="4">
                         </UTextarea>
                         <div class="flex flex-col gap-2">
                             <UButton type="button" color="gray" icon="i-heroicons-paper-clip" class="flex-shrink-0"
