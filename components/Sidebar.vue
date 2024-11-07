@@ -5,6 +5,7 @@
                 New Agent
             </UButton>
             <ColorButton />
+            <ColorPicker />
         </div>
         <UScrollbar class="h-[calc(100vh-8rem)]">
             <div class="space-y-2">
