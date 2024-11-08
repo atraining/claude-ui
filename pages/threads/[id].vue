@@ -47,11 +47,11 @@
                             :rows="3" :auto-size="true" :max-rows="4">
                         </UTextarea>
                         <div class="flex flex-col gap-2">
-                            <UButton :loading="loader" type="button" color="gray" icon="i-heroicons-paper-clip" class="flex-shrink-0"
-                                @click="triggerFileInput">
+                            <UButton :loading="loader" type="button" color="gray" icon="i-heroicons-paper-clip"
+                                class="flex-shrink-0" @click="triggerFileInput">
                             </UButton>
-                            <UButton :loading="loader" type="submit" color="primary" icon="i-heroicons-paper-airplane-20-solid"
-                                class="flex-shrink-0">
+                            <UButton :loading="loader" type="submit" color="primary"
+                                icon="i-heroicons-paper-airplane-20-solid" class="flex-shrink-0">
                                 Send
                             </UButton>
                         </div>
@@ -59,7 +59,9 @@
                 </form>
 
                 <!-- Hidden file input -->
-                <input type="file" ref="fileInput" @change="handleFileSelect" multiple class="hidden">
+                <input type="file" ref="fileInput"
+                    accept=".html,.htm,.atom,.rss,.md,.markdown,.epub,.xml,.xsl,.pdf,.doc,.docx,.odt,.ott,.rtf,.xls,.xlsx,.xlsb,.xlsm,.xltx,.csv,.ods,.ots,.pptx,.potx,.odp,.otp,.odg,.otg,.png,.jpg,.jpeg,.gif,.dxf,.js,text/*"
+                    @change="handleFileSelect" multiple class="hidden">
             </div>
         </div>
         <CreateThreadModal></CreateThreadModal>
@@ -95,7 +97,7 @@ const handleFileSelect = (event) => {
     const files = Array.from(event.target.files)
     loader.value = true
     files.forEach(async (file) => {
-       
+
         let formData = new FormData()
         formData.append('file', file)
         const fileReq = await $fetch(`/api/threads/${route.params.id}/files`, {
@@ -141,7 +143,7 @@ onMounted(async () => {
     } catch (error) {
         console.error('Error loading thread:', error)
         attachedFiles.value = [] // Ensure attachedFiles is always initialized
-    }finally{
+    } finally {
         loader.value = false
     }
 })

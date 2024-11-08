@@ -27,6 +27,9 @@ pnpm install
 yarn install
 ```
 
+## ENV
+Create a .env file in the root directory and add your `ANTHROPIC_KEY` API key.
+
 ## Development Server
 Start the development server on http://localhost:3000:
 
