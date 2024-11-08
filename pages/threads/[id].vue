@@ -35,7 +35,7 @@
                         <UCheckbox v-model="file.selected" />
                         <UBadge size="sm" variant="ghost">{{ file.name }}</UBadge>
                         <UBadge size="sm" variant="solid">{{ file.tokens }} tokens</UBadge>
-                        <UButton size="xs" color="red" variant="ghost" icon="i-heroicons-x-mark"
+                        <UButton :loading="loader" size="xs" color="red" variant="ghost" icon="i-heroicons-x-mark"
                             @click="removeFile(file)" />
                     </div>
                 </div>
@@ -47,10 +47,10 @@
                             :rows="3" :auto-size="true" :max-rows="4">
                         </UTextarea>
                         <div class="flex flex-col gap-2">
-                            <UButton type="button" color="gray" icon="i-heroicons-paper-clip" class="flex-shrink-0"
+                            <UButton :loading="loader" type="button" color="gray" icon="i-heroicons-paper-clip" class="flex-shrink-0"
                                 @click="triggerFileInput">
                             </UButton>
-                            <UButton type="submit" color="primary" icon="i-heroicons-paper-airplane-20-solid"
+                            <UButton :loading="loader" type="submit" color="primary" icon="i-heroicons-paper-airplane-20-solid"
                                 class="flex-shrink-0">
                                 Send
                             </UButton>
@@ -70,6 +70,7 @@ import { ref, computed, onMounted } from 'vue'
 import Sidebar from '~/components/Sidebar.vue';
 const { $mdRenderer } = useNuxtApp()
 const { getThread } = useApp()
+const { loader } = useLoader()
 
 const route = useRoute()
 const messages = ref([])
@@ -92,8 +93,9 @@ const selectedFiles = computed(() => {
 
 const handleFileSelect = (event) => {
     const files = Array.from(event.target.files)
+    loader.value = true
     files.forEach(async (file) => {
-
+       
         let formData = new FormData()
         formData.append('file', file)
         const fileReq = await $fetch(`/api/threads/${route.params.id}/files`, {
@@ -110,13 +112,16 @@ const handleFileSelect = (event) => {
         })
     })
     fileInput.value.value = '' // Reset file input
+    loader.value = false
 }
 
 const removeFile = async (fileToRemove) => {
+    loader.value = true
     await $fetch(`/api/files/${fileToRemove.id}`, {
         method: 'DELETE',
     })
     attachedFiles.value = attachedFiles.value.filter(file => file !== fileToRemove)
+    loader.value = false
 }
 
 watch(messages, () => {
@@ -129,12 +134,15 @@ watch(messages, () => {
 
 onMounted(async () => {
     try {
+        loader.value = true
         messages.value = await $fetch('/api/messages/' + route.params.id)
         const thread = await getThread(route.params.id)
         attachedFiles.value = thread?.files ?? [] // Using nullish coalescing
     } catch (error) {
         console.error('Error loading thread:', error)
         attachedFiles.value = [] // Ensure attachedFiles is always initialized
+    }finally{
+        loader.value = false
     }
 })
 
@@ -147,6 +155,7 @@ const handleSendMessage = async () => {
         }
         messages.value.push(newMessage)
         inputMessage.value = ''
+        loader.value = true
 
         const res = await $fetch('/api/chat', {
             method: 'POST',
@@ -156,6 +165,8 @@ const handleSendMessage = async () => {
                 selectedFiles: selectedFiles.value
             })
         })
+
+        loader.value = false
 
         messages.value.push({
             id: messages.value.length + 1,

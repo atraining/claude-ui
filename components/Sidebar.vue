@@ -1,7 +1,7 @@
 <template>
     <div class="w-64 dark:bg-gray-900 bg-white border-r border-gray-200 p-4">
         <div class="flex align-center justify-between mb-4">
-            <UButton icon="i-heroicons-plus-circle" class="justify-start" @click="openModal">
+            <UButton :loading="loader" icon="i-heroicons-plus-circle" class="justify-start" @click="openModal">
                 New Agent
             </UButton>
             <ColorButton />
@@ -17,9 +17,9 @@
                     </UButton>
 
                     <div class="hidden group-hover:flex gap-1">
-                        <UButton size="xs" color="gray" variant="ghost" icon="i-heroicons-pencil-square"
+                        <UButton :loading="loader" size="xs" color="gray" variant="ghost" icon="i-heroicons-pencil-square"
                             @click="editThread(thread.id)" />
-                        <UButton size="xs" color="red" variant="ghost" icon="i-heroicons-trash"
+                        <UButton :loading="loader" size="xs" color="red" variant="ghost" icon="i-heroicons-trash"
                             @click="deleteThread(thread.id)" />
                     </div>
                 </div>
@@ -30,6 +30,7 @@
 
 <script setup>
 const { isModalOpen, openModal } = useCustomModal()
+const { loader } = useLoader()
 
 const { threads } = useApp()
 const route = useRoute()
