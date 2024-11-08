@@ -8,9 +8,6 @@ interface Message {
 }
 
 const MAX_MESSAGES = 4;
-const MODEL = "claude-3-5-sonnet-20241022";
-const MAX_TOKENS = 1024;
-const TEMPERATURE = 0;
 
 export default defineEventHandler(async (event: H3Event) => {
   try {
@@ -85,10 +82,10 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // Make API call
     const response = await anthropic.beta.promptCaching.messages.create({
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
+      model: thread.results[0].model || "claude-3-5-sonnet-latest",
+      max_tokens: thread.results[0].max_tokens || 1024,
       messages: processedMessages,
-      temperature: thread.results[0].temperature || TEMPERATURE,
+      temperature: thread.results[0].temperature || 0.5,
       system: systemMessage,
     });
 

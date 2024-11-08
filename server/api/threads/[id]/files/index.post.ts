@@ -71,7 +71,7 @@ export default defineEventHandler(async (event) => {
   } catch (error) {
     throw createError({
       statusCode: 500,
-      message: "Error processing file upload",
+      message: "Error processing file upload" + error.message,
     });
   }
 });

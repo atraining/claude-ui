@@ -13,6 +13,20 @@
                         <UTextarea id="systemMessage" v-model="systemMessage"
                             placeholder="Enter a system message for the chat" />
                     </UFormGroup>
+
+                    <div class="flex gap-2 justify-between">
+                        
+                        <UFormGroup label="Max Tokens">
+                            <UInput type="number" min="10" id="maxTokens" v-model="maxTokens"
+                                placeholder="Enter max token for the responce" />
+                        </UFormGroup>
+
+                        <UFormGroup label="Model">
+                            <USelect v-model="model" :options="models" />
+                        </UFormGroup>
+
+                    </div>
+
                     <UFormGroup label="Creativity" label-for="temperature">
                         <URange id="temperature" v-model="temperature" min="0" max="1" step="0.1" />
                     </UFormGroup>
@@ -30,6 +44,9 @@ const { isModalOpen, closeModal } = useCustomModal()
 const name = ref('')
 const systemMessage = ref('')
 const temperature = ref(0.5)
+const maxTokens = ref(1024)
+const model = ref('claude-3-5-sonnet-latest')
+const models = ['claude-3-5-sonnet-latest', 'claude-3-5-haiku-latest', 'claude-3-opus-latest']
 
 const handleCreateThread = async () => {
     const res = await $fetch('/api/threads', {
@@ -38,6 +55,8 @@ const handleCreateThread = async () => {
             name: name.value,
             systemMessage: systemMessage.value,
             temperature: temperature.value,
+            model: model.value,
+            maxTokens: maxTokens.value
         })
     })
 

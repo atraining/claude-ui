@@ -6,6 +6,8 @@ export const threads = sqliteTable("threads", {
   systemMessage: text("system_message"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   temperature: real("temperature").default(0.5),
+  model : text('model').default('claude-3-5-sonnet-20241022'),
+  maxTokens : integer('max_tokens').default(1024)
 });
 
 export const messages = sqliteTable("messages", {

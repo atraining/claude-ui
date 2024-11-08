@@ -30,7 +30,8 @@
             <div class="shrink-0 pb-4 px-4">
                 <!-- File Attachments Display -->
                 <div v-if="attachedFiles.length" class="mb-2 flex flex-wrap">
-                    <div v-for="file in attachedFiles" :key="file.name" class=" p-2 mr-2 flex items-center gap-2 mb-1 bg-gray-50 dark:bg-gray-800 rounded">
+                    <div v-for="file in attachedFiles" :key="file.name"
+                        class=" p-2 mr-2 flex items-center gap-2 mb-1 bg-gray-50 dark:bg-gray-800 rounded">
                         <UCheckbox v-model="file.selected" />
                         <UBadge size="sm" variant="ghost">{{ file.name }}</UBadge>
                         <UBadge size="sm" variant="solid">{{ file.tokens }} tokens</UBadge>
@@ -104,22 +105,26 @@ const handleFileSelect = (event) => {
             file,
             name: file.name,
             selected: true,
-            id : fileReq.last_row_id
+            tokens: fileReq.file.tokens,
+            id: fileReq.last_row_id
         })
     })
     fileInput.value.value = '' // Reset file input
 }
 
-const removeFile = (fileToRemove) => {
+const removeFile = async (fileToRemove) => {
+    await $fetch(`/api/files/${fileToRemove.id}`, {
+        method: 'DELETE',
+    })
     attachedFiles.value = attachedFiles.value.filter(file => file !== fileToRemove)
 }
 
 watch(messages, () => {
-  nextTick(() => {
-    if (messagesContainer.value) {
-      messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
-    }
-  })
+    nextTick(() => {
+        if (messagesContainer.value) {
+            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+        }
+    })
 }, { deep: true })
 
 onMounted(async () => {
@@ -148,7 +153,7 @@ const handleSendMessage = async () => {
             body: JSON.stringify({
                 messages: messages.value,
                 threadId: route.params.id,
-                selectedFiles : selectedFiles.value
+                selectedFiles: selectedFiles.value
             })
         })
 
@@ -173,7 +178,4 @@ const handleSendMessage = async () => {
     max-width: 100%;
     overflow-x: auto;
 }
-
-
-
 </style>
