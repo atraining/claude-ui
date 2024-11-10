@@ -1,9 +1,22 @@
 # Claude UI
+A modern chat interface for Anthropic's Claude AI models built with Nuxt.js. Experience seamless conversations with Claude in a clean user interface.
 
-Anthropic UI for chatting with claude models built with Nuxt.js
+<p align="center">
+  <img src="./public/1.PNG" alt="Claude UI Screenshot">
+</p>
 
-## Features
+## 🌟 Features
+- 💾 Conversation history management
+- 🎭 Multiple Claude model support
+- 📝 Markdown and code syntax highlighting
+- 🌙 Dark/Light mode toggle
+- 🤖 Personlize behavior using system prompts for each chat
+- 🎯 Limit output tokens for each chat
+- 🔄 Custome temperature (Randomness) for each chat
+- 📎💾 Prompt Caching for attachments
+- 📝🔍 Text extraction and parsing
 
+## Tech Stack
 - 🚀 Built with [Nuxt 3](https://nuxt.com/)
 - 💾 Database integration with [Drizzle ORM](https://orm.drizzle.team/)
 - 🎨 UI components from [@nuxt/ui](https://ui.nuxt.com/)
@@ -28,9 +41,11 @@ yarn install
 ```
 
 ## ENV
+
 Create a .env file in the root directory and add your `ANTHROPIC_KEY` API key.
 
 ## Development Server
+
 Start the development server on http://localhost:3000:
 
 ```bash
@@ -45,6 +60,7 @@ yarn dev
 ```
 
 ## Production
+
 Build the application for production:
 
 ```bash
@@ -59,9 +75,11 @@ yarn build
 ```
 
 ## Database
+
 The application uses a SQLite database to store thread and message data.
 
 ### Database Management
+
 This project uses Drizzle ORM for database management. Available commands:
 
 ```bash
@@ -73,7 +91,7 @@ npm run db:migrate
 ```
 
 ## Todo
+
 - Add streaming support for long-running chats
 - Add server-side validation for form inputs
 - Add user authentication
-
