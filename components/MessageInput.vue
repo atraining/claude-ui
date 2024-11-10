@@ -1,32 +1,19 @@
 <template>
     <div class="shrink-0 pb-4 px-4">
         <FileAttachments :files="attachedFiles" @remove-file="removeFile" />
-        
+
         <form @submit.prevent="handleSendMessage" class="flex flex-col gap-2">
             <div class="flex gap-2">
-                <UTextarea 
-                    v-model="inputMessage" 
-                    placeholder="Type your message here..."
+                <UTextarea v-model="inputMessage" placeholder="Type your message here..."
                     class="flex-grow min-w-0 bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-                    :rows="3" 
-                    :auto-size="true" 
-                    :max-rows="4">
+                    :rows="3" :auto-size="true" :max-rows="4">
                 </UTextarea>
-                
+
                 <div class="flex flex-col gap-2">
-                    <UButton 
-                        :loading="loader" 
-                        type="button" 
-                        color="gray" 
-                        icon="i-heroicons-paper-clip"
-                        class="flex-shrink-0" 
-                        @click="triggerFileInput">
+                    <UButton :loading="loader" type="button" color="gray" icon="i-heroicons-paper-clip"
+                        class="flex-shrink-0" @click="triggerFileInput">
                     </UButton>
-                    <UButton 
-                        :loading="loader" 
-                        type="submit" 
-                        color="primary"
-                        icon="i-heroicons-paper-airplane-20-solid" 
+                    <UButton :loading="loader" type="submit" color="primary" icon="i-heroicons-paper-airplane-20-solid"
                         class="flex-shrink-0">
                         Send
                     </UButton>
@@ -35,13 +22,9 @@
         </form>
 
         <!-- Hidden file input -->
-        <input 
-            type="file" 
-            ref="fileInput"
+        <input type="file" ref="fileInput"
             accept=".html,.ts,.htm,.atom,.rss,.md,.markdown,.epub,.xml,.xsl,.pdf,.doc,.docx,.odt,.ott,.rtf,.xls,.xlsx,.xlsb,.xlsm,.xltx,.csv,.ods,.ots,.pptx,.potx,.odp,.otp,.odg,.otg,.png,.jpg,.jpeg,.gif,.dxf,.js,text/*"
-            @change="handleFileSelect" 
-            multiple 
-            class="hidden">
+            @change="handleFileSelect" multiple class="hidden">
     </div>
 </template>
 
@@ -49,7 +32,7 @@
 import { ref } from 'vue'
 const route = useRoute()
 const { loader } = useLoader()
-const {  messages } = useApp()
+const { messages } = useApp()
 
 const props = defineProps({
     attachedFiles: {
@@ -78,7 +61,7 @@ const selectedFiles = computed(() => {
 const handleFileSelect = async (event) => {
     const files = Array.from(event.target.files)
     loader.value = true
-    
+
     try {
         for (const file of files) {
             let formData = new FormData()
@@ -124,7 +107,7 @@ const handleSendMessage = async () => {
     if (inputMessage.value.trim() !== '') {
         const newMessage = {
             id: messages.value.length + 1,
-            createdAt : new Date(),   
+            createdAt: new Date(),
             content: inputMessage.value,
             role: 'user'
         }
@@ -144,7 +127,7 @@ const handleSendMessage = async () => {
             messages.value.push({
                 id: messages.value.length + 1,
                 content: res.content[0].text,
-                createdAt : new Date(),   
+                createdAt: new Date(),
                 role: 'assistant'
             })
         } catch (error) {
