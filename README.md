@@ -68,8 +68,12 @@ This project uses Drizzle ORM for database management. Available commands:
 # Generate database schema
 npm run db:generate
 
-# Push schema changes to database
-npm run db:push
-
+# Migrate database schema
+npm run db:migrate
 ```
+
+## Todo
+- Add streaming support for long-running chats
+- Add server-side validation for form inputs
+- Add user authentication
 
