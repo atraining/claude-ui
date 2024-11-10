@@ -124,6 +124,7 @@ const removeFile = async (fileToRemove) => {
     })
     attachedFiles.value = attachedFiles.value.filter(file => file !== fileToRemove)
     loader.value = false
+    navigateTo('/')
 }
 
 watch(messages, () => {
