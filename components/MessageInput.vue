@@ -143,6 +143,7 @@ const handleSendMessage = async () => {
             messages.value.push({
                 id: messages.value.length + 1,
                 content: res.content[0].text,
+                createdAt : new Date(),   
                 role: 'assistant'
             })
         } catch (error) {

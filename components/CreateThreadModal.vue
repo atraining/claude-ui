@@ -15,7 +15,7 @@
                     </UFormGroup>
 
                     <div class="flex gap-2 justify-between">
-                        
+
                         <UFormGroup label="Max Tokens">
                             <UInput type="number" min="10" id="maxTokens" v-model="maxTokens"
                                 placeholder="Enter max token for the responce" />
