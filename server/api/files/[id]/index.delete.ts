@@ -1,9 +1,15 @@
+import db from '~/server/utils/db'
+import { eq } from 'drizzle-orm'
+import { files } from '~/server/database/schema'
+
 export default defineEventHandler(async (event) => {
   try {
-    const db = hubDatabase();
     const id = event.context.params.id;
-    const stmt = await db.prepare("DELETE FROM files WHERE id = ?").bind(id).run();
-    return stmt.changes;
+    
+    const result = await db.delete(files)
+      .where(eq(files.id, id));
+    
+    return { deleted: result.rowsAffected };
   } catch (error) {
     console.error("Error in files.delete handler:", error);
     throw createError({
@@ -11,4 +17,4 @@ export default defineEventHandler(async (event) => {
       message: error.message || "Internal server error",
     });
   }
-})
+});

@@ -1,23 +1,26 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { parseFile } from "~/server/utils/fileParser";
+import db from '~/server/utils/db';
+import { files } from '~/server/database/schema';
 
 export default defineEventHandler(async (event) => {
-  // Get configuration and request body
-  const { anthropicKey } = useRuntimeConfig();
-  const db = hubDatabase();
-  // Initialize Anthropic client
-  const anthropic = new Anthropic({
-    apiKey: anthropicKey,
-  });
+  try {
+    // Get configuration and request body
+    const { anthropicKey } = useRuntimeConfig();
+    
+    // Initialize Anthropic client
+    const anthropic = new Anthropic({
+      apiKey: anthropicKey,
+    });
 
-  // Get thread ID from URL parameters
-  const threadId = event.context.params.id;
+    // Get thread ID from URL parameters
+    const threadId = event.context.params.id;
 
-  const formData = await readMultipartFormData(event);
+    const formData = await readMultipartFormData(event);
 
-  for (const field of formData) {
-    if (!field.data || !field.filename) continue;
-    try {
+    for (const field of formData) {
+      if (!field.data || !field.filename) continue;
+
       const text = await parseFile(field.filename, field.data, field.type);
 
       const tokens = await anthropic.beta.messages.countTokens({
@@ -30,25 +33,21 @@ export default defineEventHandler(async (event) => {
         ],
       });
 
-      const fileQuery = await db
-        .prepare(
-          "INSERT INTO files (name, path, text , tokens , created_at , thread_id) VALUES ( ?, ?, ?, ?, ?, ?)"
-        )
-        .bind(
-          ...[
-            field.filename,
-            field.filename,
-            text,
-            tokens.input_tokens,
-            Date.now(),
-            threadId,
-          ]
-        )
-        .run();
+      // Insert file using Drizzle
+      const [insertedFile] = await db.insert(files)
+        .values({
+          name: field.filename,
+          path: field.filename,
+          text: text,
+          tokens: tokens.input_tokens,
+          createdAt: new Date(),
+          threadId: threadId
+        })
+        .returning({ id: files.id }); // Return the inserted ID
 
       return {
         threadId,
-        last_row_id: fileQuery.meta.last_row_id,
+        last_row_id: insertedFile.id,
         file: {
           filename: field.filename,
           type: field.type,
@@ -56,12 +55,12 @@ export default defineEventHandler(async (event) => {
           size: field.data.length,
         },
       };
-    } catch (error) {
-      console.error("Error parsing file:", error);
-      throw createError({
-        statusCode: 500,
-        message: "Error parsing file",
-      });
     }
+  } catch (error) {
+    console.error("Error parsing file:", error);
+    throw createError({
+      statusCode: 500,
+      message: "Error parsing file",
+    });
   }
 });

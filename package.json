@@ -4,11 +4,12 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "npm run db:migrate && nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare && npm run db:push",
+    "postinstall": "nuxt prepare && npm run db:migrate",
     "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push:sqlite"
   },
   "dependencies": {
@@ -16,8 +17,8 @@
     "@iconify-json/heroicons": "^1.2.1",
     "@nosferatu500/textract": "^3.1.3",
     "@nuxt/ui": "^2.18.7",
-    "@nuxthub/core": "^0.8.4",
-    "drizzle-orm": "^0.36.0",
+    "better-sqlite3": "^9.6.0",
+    "drizzle-orm": "^0.36.1",
     "highlight.js": "^11.10.0",
     "markdown-it": "^14.1.0",
     "nuxt": "^3.13.2",
@@ -25,8 +26,9 @@
     "vue-router": "latest"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
     "@types/markdown-it": "^14.1.2",
-    "drizzle-kit": "^0.27.1",
+    "drizzle-kit": "^0.27.2",
     "wrangler": "^3.84.1"
   }
 }

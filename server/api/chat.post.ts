@@ -1,5 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { H3Event } from "h3";
+import { eq, and, inArray } from 'drizzle-orm';
+import { threads, messages, files } from '~/server/database/schema';
+import db from '~/server/utils/db'
 
 interface Message {
   id?: string;
@@ -13,7 +16,7 @@ export default defineEventHandler(async (event: H3Event) => {
   try {
     // Get configuration and request body
     const { anthropicKey } = useRuntimeConfig();
-    const db = hubDatabase();
+
     // Initialize Anthropic client
     const anthropic = new Anthropic({
       apiKey: anthropicKey,
@@ -27,54 +30,59 @@ export default defineEventHandler(async (event: H3Event) => {
     }
 
     const body = await readBody(event);
-    const messages = validateMessages(body.messages);
+    const validatedMessages = validateMessages(body.messages);
 
-    const thread = await db
-      .prepare("SELECT * FROM threads WHERE id = ?")
-      .bind(body.threadId)
-      .run();
+    // Get thread using Drizzle
+    const [thread] = await db
+      .select()
+      .from(threads)
+      .where(eq(threads.id, body.threadId));
 
-    await db
-      .prepare(
-        "INSERT INTO messages (content, role , created_at , thread_id) VALUES ( ?, 'user' , ?, ?)"
-      )
-      .bind(
-        ...[messages[messages.length - 1].content, Date.now(), body.threadId]
-      )
-      .run();
+    if (!thread) {
+      throw createError({
+        statusCode: 404,
+        message: "Thread not found",
+      });
+    }
+
+    // Insert user message using Drizzle
+    await db.insert(messages).values({
+      content: validatedMessages[validatedMessages.length - 1].content,
+      role: 'user',
+      createdAt: new Date(),
+      threadId: body.threadId
+    });
 
     // Process messages
-    const processedMessages = preprocessMessages(messages);
+    const processedMessages = preprocessMessages(validatedMessages);
 
     let systemMessage = [
       {
         type: "text",
-        text:
-          thread.results[0].system_message || "You are a helpfull assistant",
+        text: thread.systemMessage || "You are a helpful assistant",
         cache_control: { type: "ephemeral" },
       },
     ];
 
     if (body.selectedFiles && body.selectedFiles.length > 0) {
-      // retreive text from files
-      const placeholders = body.selectedFiles.map(() => "?").join(",");
-      const files = await db
-        .prepare(
-          ` SELECT 
-              f.name,
-              f.text
-            FROM files f
-            WHERE f.thread_id = ?
-            AND f.id IN (${placeholders})`
-        )
-        .bind(body.threadId, ...body.selectedFiles)
-        .run();
+      // Retrieve text from files using Drizzle
+      const selectedFiles = await db
+        .select({
+          name: files.name,
+          text: files.text
+        })
+        .from(files)
+        .where(
+          and(
+            eq(files.threadId, body.threadId),
+            inArray(files.id, body.selectedFiles)
+          )
+        );
 
-      for (let f = 0; f < files.results.length; f++) {
-        const element = files.results[f];
+      for (const file of selectedFiles) {
         systemMessage.push({
           type: "text",
-          text: element.text,
+          text: file.text,
           cache_control: { type: "ephemeral" },
         });
       }
@@ -82,19 +90,20 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // Make API call
     const response = await anthropic.beta.promptCaching.messages.create({
-      model: thread.results[0].model || "claude-3-5-sonnet-latest",
-      max_tokens: thread.results[0].max_tokens || 1024,
+      model: thread.model || "claude-3-5-sonnet-latest",
+      max_tokens: thread.maxTokens || 1024,
       messages: processedMessages,
-      temperature: thread.results[0].temperature || 0.5,
+      temperature: thread.temperature || 0.5,
       system: systemMessage,
     });
 
-    await db
-      .prepare(
-        "INSERT INTO messages (content, role , created_at, thread_id) VALUES ( ?, 'assistant' , ?, ?)"
-      )
-      .bind(...[response.content[0].text, Date.now(), body.threadId])
-      .run();
+    // Insert assistant message using Drizzle
+    await db.insert(messages).values({
+      content: response.content[0].text,
+      role: 'assistant',
+      createdAt: new Date(),
+      threadId: body.threadId
+    });
 
     return response;
   } catch (error) {
@@ -134,7 +143,6 @@ function validateMessages(messages: any): Message[] {
 }
 
 function preprocessMessages(messages: Message[]): Message[] {
-  // Create a new array with cleaned messages
   return messages
     .map(({ role, content }) => ({ role, content }))
     .slice(-MAX_MESSAGES);

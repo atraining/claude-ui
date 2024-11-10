@@ -9,8 +9,9 @@ export async function parseFile(
   mimeType?: string
 ): Promise<string> {
   try {
-    console.log(mimeType)
-    if (mimeType.startsWith("text/") || mimeType === "application/json") {
+    // get the extension of the file
+    const ext = filename.split(".").pop();
+    if (mimeType.startsWith("text/") || ext  === 'ts'  || mimeType === "application/json") {
       return buffer.toString();
     }
 

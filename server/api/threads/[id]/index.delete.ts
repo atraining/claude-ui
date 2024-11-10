@@ -1,15 +1,23 @@
-
+import db from '~/server/utils/db'
+import { eq } from 'drizzle-orm'
+import { threads, messages, files } from '~/server/database/schema'
 
 export default defineEventHandler(async (event) => {
     try {
-        const db = hubDatabase();
         const id = event.context.params.id;
-        const stmt = await db.prepare("DELETE FROM threads WHERE id = ?").bind(id).run();
-        // delete from messages where thread_id = ?
-        const stmt2 = await db.prepare("DELETE FROM messages WHERE thread_id = ?").bind(id).run();
-        // delete from files where thread_id = ?
-        const stmt3 = await db.prepare("DELETE FROM files WHERE thread_id = ?").bind(id).run();
-        return stmt.changes;
+
+        // Delete related records first (to maintain referential integrity)
+        await db.delete(messages)
+            .where(eq(messages.threadId, id));
+
+        await db.delete(files)
+            .where(eq(files.threadId, id));
+
+        // Delete the thread last
+        const result = await db.delete(threads)
+            .where(eq(threads.id, id));
+
+        return { deleted: result.rowsAffected };
     } catch (error) {
         console.error("Error in threads.delete handler:", error);
         throw createError({

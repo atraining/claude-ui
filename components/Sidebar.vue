@@ -17,8 +17,6 @@
                     </UButton>
 
                     <div class="hidden group-hover:flex gap-1">
-                        <UButton :loading="loader" size="xs" color="gray" variant="ghost" icon="i-heroicons-pencil-square"
-                            @click="editThread(thread.id)" />
                         <UButton :loading="loader" size="xs" color="red" variant="ghost" icon="i-heroicons-trash"
                             @click="deleteThread(thread.id)" />
                     </div>

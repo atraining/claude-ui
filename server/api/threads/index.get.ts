@@ -1,11 +1,10 @@
+import db from "~/server/utils/db";
+
 export default defineEventHandler(async (event) => {
   try {
-    const db = hubDatabase();
-
     // First get threads with basic info
-    const threads = await db
-      .prepare(
-        `
+    const threads = await db.all(
+      `
         SELECT 
           t.id,
           t.name,
@@ -23,11 +22,10 @@ export default defineEventHandler(async (event) => {
         FROM threads t
         ORDER BY t.created_at DESC
       `
-      )
-      .all();
+    );
 
     // Parse the JSON string in files column
-    return threads.results.map((thread) => ({
+    return threads.map((thread) => ({
       ...thread,
       files: JSON.parse(thread.files || "[]"),
     }));

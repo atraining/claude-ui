@@ -2,11 +2,9 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
-  modules: ["@nuxt/ui", "@nuxthub/core"],
+  modules: ["@nuxt/ui"],
   runtimeConfig: {
     anthropicKey: process.env.ANTHROPIC_KEY,
-  },
-  hub: {
-    database: true,
+    databaseUrl: process.env.DATABASE_URL,
   },
 });
