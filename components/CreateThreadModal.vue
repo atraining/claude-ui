@@ -60,7 +60,7 @@ const handleCreateThread = async () => {
         })
     })
 
-    navigateTo('/threads/' + res.last_row_id)
+    navigateTo('/threads/' + res.id)
 
     closeModal()
 
