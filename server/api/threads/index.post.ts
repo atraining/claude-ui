@@ -1,14 +1,20 @@
+import db from "~/server/utils/db";
+import { threads } from '~/server/database/schema';
+
 export default defineEventHandler(async (event) => {
   try {
-    const db = hubDatabase();
     const { name, systemMessage, temperature , model , maxTokens } = await readBody(event);
-    const stmt = await db
-      .prepare(
-        "INSERT INTO threads (name, system_message, created_at , temperature , model , max_tokens) VALUES ( ?, ?, ?, ?, ?, ?)"
-      )
-      .bind(name, systemMessage, Date.now(), temperature , model , maxTokens )
-      .run();
-    return stmt.meta;
+    const stmt = await  db.insert(threads).values({
+      name : name,
+      systemMessage: systemMessage,
+      temperature: temperature,
+      model: model,
+      maxTokens: maxTokens,
+      createdAt: new Date(),
+    });
+    return {
+      id: stmt.lastInsertRowid,
+    };
   } catch (error) {
     console.error("Error in threads.post handler:", error);
     throw createError({
