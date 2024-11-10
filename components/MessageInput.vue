@@ -124,6 +124,7 @@ const handleSendMessage = async () => {
     if (inputMessage.value.trim() !== '') {
         const newMessage = {
             id: messages.value.length + 1,
+            createdAt : new Date(),   
             content: inputMessage.value,
             role: 'user'
         }
