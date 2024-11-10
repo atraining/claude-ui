@@ -5,6 +5,6 @@ export default defineNuxtConfig({
   modules: ["@nuxt/ui"],
   runtimeConfig: {
     anthropicKey: process.env.ANTHROPIC_KEY,
-    databaseUrl: process.env.DATABASE_URL,
+    databaseUrl: process.env.DATABASE_URL || "./database.db",
   },
 });

@@ -11,7 +11,7 @@
                     </UFormGroup>
                     <UFormGroup label="Instructions" label-for="systemMessage">
                         <UTextarea id="systemMessage" v-model="systemMessage"
-                            placeholder="Enter a system message for the chat" />
+                            placeholder="You are a helpful assistant" />
                     </UFormGroup>
 
                     <div class="flex gap-2 justify-between">
