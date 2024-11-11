@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-app",
+  "name": "claude-ui",
   "private": true,
   "type": "module",
   "scripts": {

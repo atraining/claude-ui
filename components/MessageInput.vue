@@ -124,6 +124,8 @@ const handleSendMessage = async () => {
                 })
             })
 
+            inputMessage.value = ''
+
             messages.value.push({
                 id: messages.value.length + 1,
                 content: res.content[0].text,
