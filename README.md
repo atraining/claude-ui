@@ -1,6 +1,12 @@
 # Claude UI
 A modern chat interface for Anthropic's Claude AI models built with Nuxt.js. Experience seamless conversations with Claude in a clean user interface.
 
+## Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+- Anthropic API key
+
 <p align="center">
   <img src="./public/1.PNG" alt="Claude UI Screenshot">
 </p>
@@ -92,6 +98,6 @@ npm run db:migrate
 
 ## Todo
 
-- Add streaming support for long-running chats
-- Add server-side validation for form inputs
-- Add user authentication
+- [ ] Add streaming support for long-running chats
+- [ ] Add server-side validation for form inputs
+- [ ] Add user authentication
