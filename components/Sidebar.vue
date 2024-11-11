@@ -45,15 +45,14 @@ const editThread = (id) => {
     // Handle editing thread
 }
 
-const deleteThread = (id) => {
+const deleteThread = async (id) => {
     // Handle deleting thread
-    $fetch('/api/threads/' + id, {
+    await $fetch('/api/threads/' + id, {
         method: 'DELETE'
     })
-        .then(() => {
-            threads.value = threads.value.filter(thread => thread.id !== id)
-        })
-}
+    threads.value = threads.value.filter(thread => thread.id !== id)
+    navigateTo('/')
+}   
 const openThread = (threadId) => {
     navigateTo('/threads/' + threadId)
 }
