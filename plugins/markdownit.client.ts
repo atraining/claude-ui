@@ -53,7 +53,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   };
 
   // Add the copy functionality to the window object
-  if (process.client) {
+  if (import.meta.client) {
     window.copyCode = async function(id: string) {
       const codeBlock = document.getElementById(id);
       if (!codeBlock) return;

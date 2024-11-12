@@ -10,14 +10,16 @@
                         <UInput id="name" v-model="name" placeholder="Enter a name for the chat" />
                     </UFormGroup>
                     <UFormGroup label="Instructions" label-for="systemMessage">
-                        <UTextarea id="systemMessage" v-model="systemMessage"
+                        <UTextarea
+id="systemMessage" v-model="systemMessage"
                             placeholder="You are a helpful assistant" />
                     </UFormGroup>
 
                     <div class="flex gap-2 justify-between">
 
                         <UFormGroup label="Max Tokens">
-                            <UInput type="number" min="10" id="maxTokens" v-model="maxTokens"
+                            <UInput
+id="maxTokens" v-model="maxTokens" type="number" min="10"
                                 placeholder="Enter max token for the responce" />
                         </UFormGroup>
 

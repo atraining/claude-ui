@@ -1,13 +1,13 @@
 <template>
     <div class="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
-        <Sidebar></Sidebar>
+        <Sidebar/>
         <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
             <!-- Messages List Component -->
             <MessageList :messages="messages" />
 
             <!-- Message Input Component -->
             <MessageInput 
-                v-model:attachedFiles="attachedFiles"
+                v-model:attached-files="attachedFiles"
                 @send-message="handleSendMessage"
             />
         </div>

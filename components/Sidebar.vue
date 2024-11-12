@@ -10,14 +10,16 @@
         <UScrollbar class="h-[calc(100vh-8rem)]">
             <div class="space-y-2">
                 <div v-for="thread in threads" :key="thread.id" class="flex items-center gap-2 group">
-                    <UButton variant="soft" block class="flex-1"
+                    <UButton
+variant="soft" block class="flex-1"
                         :class="{ 'bg-primary-500 text-white dark:bg-gray-800 dark:text-white': isSelected(thread.id) }"
                         @click="openThread(thread.id)">
                         {{ thread.name }}
                     </UButton>
 
                     <div class="hidden group-hover:flex gap-1">
-                        <UButton :loading="loader" size="xs" color="red" variant="ghost" icon="i-heroicons-trash"
+                        <UButton
+:loading="loader" size="xs" color="red" variant="ghost" icon="i-heroicons-trash"
                             @click="deleteThread(thread.id)" />
                     </div>
                 </div>

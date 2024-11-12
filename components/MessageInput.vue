@@ -2,18 +2,19 @@
     <div class="shrink-0 pb-4 px-4">
         <FileAttachments :files="attachedFiles" @remove-file="removeFile" />
 
-        <form @submit.prevent="handleSendMessage" class="flex flex-col gap-2">
+        <form class="flex flex-col gap-2" @submit.prevent="handleSendMessage">
             <div class="flex gap-2">
-                <UTextarea v-model="inputMessage" placeholder="Type your message here..."
+                <UTextarea
+v-model="inputMessage" placeholder="Type your message here..."
                     class="flex-grow min-w-0 bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-                    :rows="3" :auto-size="true" :max-rows="4">
-                </UTextarea>
+                    :rows="3" :auto-size="true" :max-rows="4"/>
 
                 <div class="flex flex-col gap-2">
-                    <UButton :loading="loader" type="button" color="gray" icon="i-heroicons-paper-clip"
-                        class="flex-shrink-0" @click="triggerFileInput">
-                    </UButton>
-                    <UButton :loading="loader" type="submit" color="primary" icon="i-heroicons-paper-airplane-20-solid"
+                    <UButton
+:loading="loader" type="button" color="gray" icon="i-heroicons-paper-clip"
+                        class="flex-shrink-0" @click="triggerFileInput"/>
+                    <UButton
+:loading="loader" type="submit" color="primary" icon="i-heroicons-paper-airplane-20-solid"
                         class="flex-shrink-0">
                         Send
                     </UButton>
@@ -22,9 +23,10 @@
         </form>
 
         <!-- Hidden file input -->
-        <input type="file" ref="fileInput"
+        <input
+ref="fileInput" type="file"
             accept=".html,.ts,.htm,.atom,.rss,.md,.markdown,.epub,.xml,.xsl,.pdf,.doc,.docx,.odt,.ott,.rtf,.xls,.xlsx,.xlsb,.xlsm,.xltx,.csv,.ods,.ots,.pptx,.potx,.odp,.otp,.odg,.otg,.png,.jpg,.jpeg,.gif,.dxf,.js,text/*"
-            @change="handleFileSelect" multiple class="hidden">
+            multiple class="hidden" @change="handleFileSelect">
     </div>
 </template>
 
@@ -64,7 +66,7 @@ const handleFileSelect = async (event) => {
 
     try {
         for (const file of files) {
-            let formData = new FormData()
+            const formData = new FormData()
             formData.append('file', file)
             const fileReq = await $fetch(`/api/threads/${route.params.id}/files`, {
                 method: 'post',

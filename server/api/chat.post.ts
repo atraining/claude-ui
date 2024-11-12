@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { H3Event } from "h3";
+import type { H3Event } from "h3";
 import { eq, and, inArray } from 'drizzle-orm';
 import { threads, messages, files } from '~/server/database/schema';
 import db from '~/server/utils/db'
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event: H3Event) => {
     // Process messages
     const processedMessages = preprocessMessages(validatedMessages);
 
-    let systemMessage = [
+    const systemMessage = [
       {
         type: "text",
         text: thread.systemMessage || "You are a helpful assistant",

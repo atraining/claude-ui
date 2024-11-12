@@ -1,6 +1,6 @@
 export const useCustomModal = () => {
-  const isModalOpen = useState<Boolean>("isModalOpen", () => false);
-  const modalType = useState<String>("modalType", () => "ADD_THREAD");
+  const isModalOpen = useState<boolean>("isModalOpen", () => false);
+  const modalType = useState<string>("modalType", () => "ADD_THREAD");
   const openModal = () => {
     isModalOpen.value = true;
   };
