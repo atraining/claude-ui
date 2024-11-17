@@ -1,8 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { H3Event } from "h3";
-import { eq, and, inArray } from 'drizzle-orm';
-import { threads, messages, files } from '~/server/database/schema';
-import db from '~/server/utils/db'
+import { eq, and, inArray } from "drizzle-orm";
+import { threads, messages, files } from "~/server/database/schema";
+import db from "~/server/utils/db";
 
 interface Message {
   id?: string;
@@ -14,6 +14,9 @@ const MAX_MESSAGES = 4;
 
 export default defineEventHandler(async (event: H3Event) => {
   try {
+    // Require a user session (send back 401 if no `user` key in session)
+    const session = await requireUserSession(event);
+
     // Get configuration and request body
     const { anthropicKey } = useRuntimeConfig();
 
@@ -48,9 +51,9 @@ export default defineEventHandler(async (event: H3Event) => {
     // Insert user message using Drizzle
     await db.insert(messages).values({
       content: validatedMessages[validatedMessages.length - 1].content,
-      role: 'user',
+      role: "user",
       createdAt: new Date(),
-      threadId: body.threadId
+      threadId: body.threadId,
     });
 
     // Process messages
@@ -69,7 +72,7 @@ export default defineEventHandler(async (event: H3Event) => {
       const selectedFiles = await db
         .select({
           name: files.name,
-          text: files.text
+          text: files.text,
         })
         .from(files)
         .where(
@@ -100,9 +103,9 @@ export default defineEventHandler(async (event: H3Event) => {
     // Insert assistant message using Drizzle
     await db.insert(messages).values({
       content: response.content[0].text,
-      role: 'assistant',
+      role: "assistant",
       createdAt: new Date(),
-      threadId: body.threadId
+      threadId: body.threadId,
     });
 
     return response;

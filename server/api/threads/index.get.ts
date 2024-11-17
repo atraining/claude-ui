@@ -2,6 +2,9 @@ import db from "~/server/utils/db";
 
 export default defineEventHandler(async (event) => {
   try {
+        // Require a user session (send back 401 if no `user` key in session)
+        const session = await requireUserSession(event);
+
     // First get threads with basic info
     const threads = await db.all(
       `

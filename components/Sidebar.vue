@@ -4,31 +4,39 @@
             <UButton :loading="loader" icon="i-heroicons-plus-circle" class="justify-start" @click="openModal">
                 New Agent
             </UButton>
-            <ColorButton />
+            <DarkModeToggle />
             <ColorPicker />
         </div>
+
         <UScrollbar class="h-[calc(100vh-8rem)]">
-            <div class="space-y-2">
+            <div class="h-[calc(100vh-8rem)]">
                 <div v-for="thread in threads" :key="thread.id" class="flex items-center gap-2 group">
-                    <UButton
-variant="soft" block class="flex-1"
+                    <UButton variant="soft" block class="flex-1"
                         :class="{ 'bg-primary-500 text-white dark:bg-gray-800 dark:text-white': isSelected(thread.id) }"
                         @click="openThread(thread.id)">
                         {{ thread.name }}
                     </UButton>
 
                     <div class="hidden group-hover:flex gap-1">
-                        <UButton
-:loading="loader" size="xs" color="red" variant="ghost" icon="i-heroicons-trash"
+                        <UButton :loading="loader" size="xs" color="red" variant="ghost" icon="i-heroicons-trash"
                             @click="deleteThread(thread.id)" />
                     </div>
                 </div>
             </div>
+
         </UScrollbar>
+        <div class="flex justify-center  gap-2 mt-4">
+            <UButton icon="i-heroicons-arrow-left-end-on-rectangle" size="xs" variant="ghost" 
+                @click="logout">
+                Logout
+            </UButton>
+        </div>
     </div>
 </template>
 
 <script setup>
+const { clear } = useUserSession();
+
 const { isModalOpen, openModal } = useCustomModal()
 const { loader } = useLoader()
 
@@ -42,9 +50,9 @@ onMounted(async () => {
     threads.value = await $fetch('/api/threads')
 })
 
-
-const editThread = (id) => {
-    // Handle editing thread
+const logout = () => {
+    clear()
+    navigateTo('/login')
 }
 
 const deleteThread = async (id) => {
@@ -54,7 +62,7 @@ const deleteThread = async (id) => {
     })
     threads.value = threads.value.filter(thread => thread.id !== id)
     navigateTo('/')
-}   
+}
 const openThread = (threadId) => {
     navigateTo('/threads/' + threadId)
 }

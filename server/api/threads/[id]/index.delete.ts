@@ -4,6 +4,9 @@ import { threads, messages, files } from '~/server/database/schema'
 
 export default defineEventHandler(async (event) => {
     try {
+            // Require a user session (send back 401 if no `user` key in session)
+    const session = await requireUserSession(event);
+
         const id = event.context.params.id;
 
         // Delete related records first (to maintain referential integrity)

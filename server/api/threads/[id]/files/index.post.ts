@@ -5,6 +5,9 @@ import { files } from '~/server/database/schema';
 
 export default defineEventHandler(async (event) => {
   try {
+        // Require a user session (send back 401 if no `user` key in session)
+        const session = await requireUserSession(event);
+
     // Get configuration and request body
     const { anthropicKey } = useRuntimeConfig();
     
