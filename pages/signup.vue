@@ -7,14 +7,17 @@
                 </h2>
                 <DarkModeToggle />
             </div>
-            <AuthForm :onSubmit="handleSubmit" buttonText="Sign up" linkText="Already have an account?"
-                linkPath="/login">
+            <AuthForm
+:on-submit="handleSubmit" button-text="Sign up" link-text="Already have an account?"
+                link-path="/login">
                 <UFormGroup label="Email" label-for="email">
-                    <UInput v-model="email" name="email" label="Email address" placeholder="Enter your email"
+                    <UInput
+v-model="email" name="email" label="Email address" placeholder="Enter your email"
                         autocomplete="email" type="email" size="lg" required />
                 </UFormGroup>
                 <UFormGroup label="password" label-for="password">
-                    <UInput v-model="password" name="password" label="Password" placeholder="Enter your password"
+                    <UInput
+v-model="password" name="password" label="Password" placeholder="Enter your password"
                         autocomplete="new-password" type="password" size="lg" required />
                 </UFormGroup>
             </AuthForm>
