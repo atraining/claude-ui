@@ -1,16 +1,16 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { parseFile } from "~/server/utils/fileParser";
-import db from '~/server/utils/db';
-import { files } from '~/server/database/schema';
+import db from "~/server/utils/db";
+import { files } from "~/server/database/schema";
 
 export default defineEventHandler(async (event) => {
   try {
-        // Require a user session (send back 401 if no `user` key in session)
-        const session = await requireUserSession(event);
+    // Require a user session (send back 401 if no `user` key in session)
+    const session = await requireUserSession(event);
 
     // Get configuration and request body
     const { anthropicKey } = useRuntimeConfig();
-    
+
     // Initialize Anthropic client
     const anthropic = new Anthropic({
       apiKey: anthropicKey,
@@ -37,14 +37,16 @@ export default defineEventHandler(async (event) => {
       });
 
       // Insert file using Drizzle
-      const [insertedFile] = await db.insert(files)
+      const [insertedFile] = await db
+        .insert(files)
         .values({
           name: field.filename,
           path: field.filename,
           text: text,
           tokens: tokens.input_tokens,
           createdAt: new Date(),
-          threadId: threadId
+          threadId: threadId,
+          userId: session.user.id,
         })
         .returning({ id: files.id }); // Return the inserted ID
 

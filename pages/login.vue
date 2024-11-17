@@ -7,7 +7,7 @@
                 </h2>
                 <DarkModeToggle />
             </div>
-            <AuthForm :onSubmit="handleSubmit" buttonText="Login" >
+            <AuthForm :onSubmit="handleSubmit" buttonText="Login">
                 <UFormGroup label="Email" label-for="email">
                     <UInput v-model="email" name="email" label="Email address" placeholder="Enter your email"
                         autocomplete="email" type="email" size="lg" required />
@@ -35,7 +35,7 @@ const handleSubmit = async () => {
             body: JSON.stringify({ email: email.value, password: password.value })
         });
         if (res.ok) {
-           await navigateTo('/')
+            await navigateTo('/')
         }
     } catch (error) {
         console.error('Login failed', error);

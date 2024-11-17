@@ -52,7 +52,7 @@ onMounted(async () => {
 
 const logout = () => {
     clear()
-    navigateTo('/login')
+    navigateTo('/signup')
 }
 
 const deleteThread = async (id) => {

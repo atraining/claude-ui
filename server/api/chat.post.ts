@@ -54,6 +54,7 @@ export default defineEventHandler(async (event: H3Event) => {
       role: "user",
       createdAt: new Date(),
       threadId: body.threadId,
+      userId: session.user.id,
     });
 
     // Process messages
@@ -106,6 +107,7 @@ export default defineEventHandler(async (event: H3Event) => {
       role: "assistant",
       createdAt: new Date(),
       threadId: body.threadId,
+      userId: session.user.id,
     });
 
     return response;

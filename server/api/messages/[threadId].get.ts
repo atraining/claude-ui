@@ -9,6 +9,24 @@ export default defineEventHandler(async (event) => {
 
     const threadId = event.context.params.threadId;
 
+    // check if user is the owner of the thread
+    const [thread] = await db
+      .select()
+      .from(threads)
+      .where(eq(threads.id, threadId));
+    if (!thread) {
+      throw createError({
+        statusCode: 404,
+        message: "Thread not found",
+      });
+    }
+    if (thread.userId !== session.user.id) {
+      throw createError({
+        statusCode: 403,
+        message: "You are not authorized to access this thread",
+      });
+    }
+
     const msgs = await db
       .select()
       .from(messages)
