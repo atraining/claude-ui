@@ -100,4 +100,4 @@ npm run db:migrate
 
 - [ ] Add streaming support for long-running chats
 - [ ] Add server-side validation for form inputs
-- [ ] Add user authentication
+- [x] Add user authentication

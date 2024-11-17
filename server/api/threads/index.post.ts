@@ -1,16 +1,21 @@
 import db from "~/server/utils/db";
-import { threads } from '~/server/database/schema';
+import { threads } from "~/server/database/schema";
 
 export default defineEventHandler(async (event) => {
   try {
-    const { name, systemMessage, temperature , model , maxTokens } = await readBody(event);
-    const stmt = await  db.insert(threads).values({
-      name : name,
+    // Require a user session (send back 401 if no `user` key in session)
+    const session = await requireUserSession(event);
+
+    const { name, systemMessage, temperature, model, maxTokens } =
+      await readBody(event);
+    const stmt = await db.insert(threads).values({
+      name: name,
       systemMessage: systemMessage,
       temperature: temperature,
       model: model,
       maxTokens: maxTokens,
       createdAt: new Date(),
+      userId: session.user.id,
     });
     return {
       id: stmt.lastInsertRowid,

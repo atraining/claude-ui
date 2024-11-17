@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
-  modules: ["@nuxt/ui" , "@nuxt/eslint"],
+  modules: ["@nuxt/ui", "@nuxt/eslint", "nuxt-auth-utils"],
   runtimeConfig: {
     anthropicKey: process.env.ANTHROPIC_KEY,
     databaseUrl: process.env.DATABASE_URL || "./database.db",

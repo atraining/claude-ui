@@ -24,6 +24,11 @@ const { loader } = useLoader()
 
 const attachedFiles = ref([])
 
+
+definePageMeta({
+  middleware: ["auth"]
+})
+
 // get array of ids of selected files
 const selectedFiles = computed(() => {
     return attachedFiles.value

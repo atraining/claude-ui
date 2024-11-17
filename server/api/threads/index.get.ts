@@ -2,6 +2,8 @@ import db from "~/server/utils/db";
 
 export default defineEventHandler(async (event) => {
   try {
+    // Require a user session (send back 401 if no `user` key in session)
+    const session = await requireUserSession(event);
     // First get threads with basic info
     const threads = await db.all(
       `
@@ -20,6 +22,7 @@ export default defineEventHandler(async (event) => {
             WHERE f.thread_id = t.id
           ) as files
         FROM threads t
+        WHERE t.user_id = ${session.user.id}
         ORDER BY t.created_at DESC
       `
     );

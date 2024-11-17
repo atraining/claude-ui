@@ -5,7 +5,8 @@ CREATE TABLE `files` (
 	`text` text,
 	`tokens` integer,
 	`created_at` integer NOT NULL,
-	`thread_id` integer NOT NULL
+	`thread_id` integer NOT NULL,
+	`user_id` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `messages` (
@@ -13,7 +14,8 @@ CREATE TABLE `messages` (
 	`content` text,
 	`role` text,
 	`created_at` integer NOT NULL,
-	`thread_id` integer NOT NULL
+	`thread_id` integer NOT NULL,
+	`user_id` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `threads` (
@@ -21,5 +23,16 @@ CREATE TABLE `threads` (
 	`name` text,
 	`system_message` text,
 	`created_at` integer NOT NULL,
-	`temperature` real DEFAULT 0.5
+	`temperature` real DEFAULT 0.5,
+	`model` text DEFAULT 'claude-3-5-sonnet-20241022',
+	`max_tokens` integer DEFAULT 1024,
+	`user_id` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `users` (
+	`id` integer PRIMARY KEY NOT NULL,
+	`name` text,
+	`email` text,
+	`password` text,
+	`created_at` integer NOT NULL
 );
