@@ -7,7 +7,8 @@ export const threads = sqliteTable("threads", {
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   temperature: real("temperature").default(0.5),
   model : text('model').default('claude-3-5-sonnet-20241022'),
-  maxTokens : integer('max_tokens').default(1024)
+  maxTokens : integer('max_tokens').default(1024),
+  userId : integer('user_id').notNull(),
 });
 
 export const messages = sqliteTable("messages", {
@@ -16,6 +17,7 @@ export const messages = sqliteTable("messages", {
   role: text("role"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   threadId: integer("thread_id").notNull(),
+  userId: integer("user_id").notNull(),
 });
 
 export const files = sqliteTable("files", {
@@ -26,4 +28,13 @@ export const files = sqliteTable("files", {
   tokens : integer('tokens'),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   threadId: integer("thread_id").notNull(),
+  userId: integer("user_id").notNull(),
+});
+
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey(),
+  name: text("name"),
+  email: text("email"),
+  password: text("password"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
