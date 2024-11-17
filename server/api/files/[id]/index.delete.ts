@@ -9,9 +9,26 @@ export default defineEventHandler(async (event) => {
 
     const id = event.context.params.id;
 
-    const result = await db.delete(files).where(eq(files.id, id));
+    // check if user is the owner of the thread
+    if (id) {
+      const [file] = await db.select().from(files).where(eq(files.id, id));
+      if (!file) {
+        throw createError({
+          statusCode: 404,
+          message: "File not found",
+        });
+      }
+      if (file.userId !== session.user.id) {
+        throw createError({
+          statusCode: 403,
+          message: "You are not authorized to delete this file",
+        });
+      }
 
-    return { deleted: result.rowsAffected };
+      const result = await db.delete(files).where(eq(files.id, id));
+
+      return { deleted: result.rowsAffected };
+    }
   } catch (error) {
     console.error("Error in files.delete handler:", error);
     throw createError({
