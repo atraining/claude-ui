@@ -27,9 +27,12 @@ v-model="password" name="password" label="Password" placeholder="Enter your pass
 
 <script setup>
 import { ref } from 'vue'
-
+definePageMeta({
+    middleware: ["guest"]
+})
 const email = ref('');
 const password = ref('');
+const toast = useToast();
 
 const handleSubmit = async () => {
     try {
@@ -39,10 +42,22 @@ const handleSubmit = async () => {
             body: JSON.stringify({ email: email.value, password: password.value })
         });
         if (res.ok) {
-            navigateTo('/')
+            await navigateTo('/login')
+        } else {
+            const data = await res.json();
+            toast.add({
+                title: 'Error',
+                description: data.message,
+                color: "red"
+            });
         }
+
     } catch (error) {
-        console.error('Signup failed', error);
+        toast.add({
+            title: 'Error',
+            description: 'Something went wrong',
+            color: "red"
+        });
     }
 };
 </script>

@@ -24,7 +24,6 @@ const { loader } = useLoader()
 
 const attachedFiles = ref([])
 
-
 definePageMeta({
   middleware: ["auth"]
 })
