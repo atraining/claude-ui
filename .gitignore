@@ -13,6 +13,9 @@ node_modules
 logs
 *.log
 
+!server/api/logs/
+!server/api/logs/.gitkeep
+
 # Misc
 .DS_Store
 .fleet
