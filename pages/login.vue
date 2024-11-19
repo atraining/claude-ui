@@ -30,8 +30,8 @@ definePageMeta({
     middleware: ["guest"]
 })
 
-const email = ref('chiheb.design@gmail.com');
-const password = ref('chiheb.design');
+const email = ref('');
+const password = ref('');
 const toast = useToast();
 
 const handleSubmit = async () => {
