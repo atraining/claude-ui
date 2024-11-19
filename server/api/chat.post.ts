@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { H3Event } from "h3";
 import { eq, and, inArray } from "drizzle-orm";
-import { threads, messages, files } from "~/server/database/schema";
+import { threads, messages, files, logs } from "~/server/database/schema";
 import db from "~/server/utils/db";
 
 interface Message {
@@ -107,6 +107,15 @@ export default defineEventHandler(async (event: H3Event) => {
       role: "assistant",
       createdAt: new Date(),
       threadId: body.threadId,
+      userId: session.user.id,
+    });
+    // save logs
+    await db.insert(logs).values({
+      inputTokens: response.usage.input_tokens,
+      outputTokens: response.usage.output_tokens,
+      cacheCreationInputTokens: response.usage.cache_creation_input_tokens,
+      cacheReadInputTokens: response.usage.cache_read_input_tokens,
+      createdAt: new Date(),
       userId: session.user.id,
     });
 

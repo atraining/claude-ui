@@ -26,21 +26,30 @@ v-model="password" name="password" label="Password" placeholder="Enter your pass
 <script setup>
 import { ref } from 'vue'
 
-const email = ref('');
-const password = ref('');
+definePageMeta({
+    middleware: ["guest"]
+})
+
+const email = ref('chiheb.design@gmail.com');
+const password = ref('chiheb.design');
+const toast = useToast();
 
 const handleSubmit = async () => {
     try {
-        const res = await fetch('/api/auth/signin', {
+        const res = await $fetch('/api/auth/signin', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email.value, password: password.value })
         });
-        if (res.ok) {
-            await navigateTo('/')
-        }
+
+        await navigateTo('/')
+        
     } catch (error) {
         console.error('Login failed', error);
+        toast.add({
+            title: 'Login failed',
+            description: error.message,
+        })
     }
 };
 </script>

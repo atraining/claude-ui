@@ -8,6 +8,20 @@
       "when": 1731845906399,
       "tag": "0000_fearless_matthew_murdock",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1731864518706,
+      "tag": "0001_bumpy_hitman",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1731864728002,
+      "tag": "0002_square_roxanne_simpson",
+      "breakpoints": true
     }
   ]
 }

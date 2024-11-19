@@ -18,7 +18,10 @@ export default defineEventHandler(async (event) => {
       .where(eq(users.email, email));
 
     if (user.length > 0) {
-      return { error: "User already exists"};
+      throw createError({
+        statusCode: 400,
+        statusMessage: "User already exists",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

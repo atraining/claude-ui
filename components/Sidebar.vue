@@ -27,11 +27,16 @@ variant="soft" block class="flex-1"
             </div>
 
         </UScrollbar>
-        <div class="flex justify-center  gap-2 mt-4">
+        <div class="flex justify-between  gap-2 mt-4">
             <UButton
 icon="i-heroicons-arrow-left-end-on-rectangle" size="xs" variant="ghost" 
                 @click="logout">
                 Logout
+            </UButton>
+            <UButton
+icon="i-heroicons-document-magnifying-glass" size="xs" variant="ghost" 
+                @click="navigateTo('/logs')">
+                Logs
             </UButton>
         </div>
     </div>
@@ -53,9 +58,9 @@ onMounted(async () => {
     threads.value = await $fetch('/api/threads')
 })
 
-const logout = () => {
-    clear()
-    navigateTo('/signup')
+const logout = async () => {
+    await clear()
+    navigateTo('/login', { replace: true })
 }
 
 const deleteThread = async (id) => {
