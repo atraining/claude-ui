@@ -8,7 +8,11 @@ export default defineEventHandler(async (event) => {
   try {
     const body = signInRequest.parse(await readBody(event));
 
-    const [user] = await db.select().from(users).where(eq(users.email, body.email));
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, body.email));
+
     if (!user || !(await bcrypt.compare(body.password, user.password))) {
       throw createError({
         statusCode: 401,
@@ -19,16 +23,15 @@ export default defineEventHandler(async (event) => {
     const session = {
       user: {
         email: user.email,
-        id: user.id
+        id: user.id,
       },
       loggedInAt: new Date(),
-    }
+    };
 
-    await setUserSession(event, session)
+    await setUserSession(event, session);
 
     return { message: "Logged in successfully" };
   } catch (error) {
     throw error;
   }
 });
-
