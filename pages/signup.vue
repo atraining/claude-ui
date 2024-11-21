@@ -8,7 +8,9 @@
                 <DarkModeToggle />
             </div>
             <AuthForm
-:on-submit="handleSubmit" button-text="Sign up" link-text="Already have an account?"
+:on-submit="handleSubmit" 
+button-text="Sign up" 
+link-text="Already have an account?"
                 link-path="/login">
                 <UFormGroup label="Email" label-for="email">
                     <UInput

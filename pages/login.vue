@@ -7,7 +7,9 @@
                 </h2>
                 <DarkModeToggle />
             </div>
-            <AuthForm :on-submit="handleSubmit" button-text="Login">
+            <AuthForm :on-submit="handleSubmit" 
+            link-text="Don't have an account?" link-path="/signup"
+            button-text="Login">
                 <UFormGroup label="Email" label-for="email">
                     <UInput
 v-model="email" name="email" label="Email address" placeholder="Enter your email"
