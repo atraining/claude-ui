@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     const body = signInRequest.parse(await readBody(event));
 
     const [user] = await db.select().from(users).where(eq(users.email, body.email));
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || !(await bcrypt.compare(body.password, user.password))) {
       throw createError({
         statusCode: 401,
         statusMessage: "Invalid username or password",
