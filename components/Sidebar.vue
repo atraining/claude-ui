@@ -11,16 +11,14 @@
         <UScrollbar class="h-[calc(100vh-8rem)]">
             <div class="h-[calc(100vh-8rem)]">
                 <div v-for="thread in threads" :key="thread.id" class="flex items-center gap-2 group">
-                    <UButton
-variant="soft" block class="flex-1"
+                    <UButton variant="ghost" block class="flex-1"
                         :class="{ 'bg-primary-500 text-white dark:bg-gray-800 dark:text-white': isSelected(thread.id) }"
                         @click="openThread(thread.id)">
                         {{ thread.name }}
                     </UButton>
 
                     <div class="hidden group-hover:flex gap-1">
-                        <UButton
-:loading="loader" size="xs" color="red" variant="ghost" icon="i-heroicons-trash"
+                        <UButton :loading="loader" size="xs" color="red" variant="ghost" icon="i-heroicons-trash"
                             @click="deleteThread(thread.id)" />
                     </div>
                 </div>
@@ -28,13 +26,10 @@ variant="soft" block class="flex-1"
 
         </UScrollbar>
         <div class="flex justify-between  gap-2 mt-4">
-            <UButton
-icon="i-heroicons-arrow-left-end-on-rectangle" size="xs" variant="ghost" 
-                @click="logout">
+            <UButton icon="i-heroicons-arrow-left-end-on-rectangle" size="xs" variant="ghost" @click="logout">
                 Logout
             </UButton>
-            <UButton
-icon="i-heroicons-document-magnifying-glass" size="xs" variant="ghost" 
+            <UButton icon="i-heroicons-document-magnifying-glass" size="xs" variant="ghost"
                 @click="navigateTo('/logs')">
                 Logs
             </UButton>

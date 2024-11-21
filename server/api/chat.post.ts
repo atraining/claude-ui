@@ -1,14 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { messageRequest } from "~/server/api/validations/chat";
 import type { H3Event } from "h3";
-import { eq, and, inArray } from "drizzle-orm";
+import { eq, and, inArray, desc } from "drizzle-orm";
 import { threads, messages, files, logs } from "~/server/database/schema";
 import db from "~/server/utils/db";
-
-interface Message {
-  id?: string;
-  role: "user" | "assistant";
-  content: string;
-}
 
 const MAX_MESSAGES = 4;
 
@@ -19,12 +14,6 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // Get configuration and request body
     const { anthropicKey } = useRuntimeConfig();
-
-    // Initialize Anthropic client
-    const anthropic = new Anthropic({
-      apiKey: anthropicKey,
-    });
-
     if (!anthropicKey) {
       throw createError({
         statusCode: 500,
@@ -32,8 +21,10 @@ export default defineEventHandler(async (event: H3Event) => {
       });
     }
 
-    const body = await readBody(event);
-    const validatedMessages = validateMessages(body.messages);
+    // Parse and validate request body using Zod
+    const body = messageRequest.parse(await readBody(event));
+    // Initialize Anthropic client
+    const anthropic = new Anthropic({ apiKey: anthropicKey });
 
     // Get thread using Drizzle
     const [thread] = await db
@@ -50,15 +41,23 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // Insert user message using Drizzle
     await db.insert(messages).values({
-      content: validatedMessages[validatedMessages.length - 1].content,
+      content: body.prompt,
       role: "user",
       createdAt: new Date(),
       threadId: body.threadId,
       userId: session.user.id,
     });
 
-    // Process messages
-    const processedMessages = preprocessMessages(validatedMessages);
+    // Fetch last MAX_MESSAGES from the database
+    const dbMessages = await db
+      .select()
+      .from(messages)
+      .where(eq(messages.threadId, body.threadId))
+      .orderBy(desc(messages.createdAt))
+      .limit(MAX_MESSAGES);
+
+    const processedMessages = preprocessMessages(dbMessages);
+
 
     const systemMessage = [
       {
@@ -109,7 +108,8 @@ export default defineEventHandler(async (event: H3Event) => {
       threadId: body.threadId,
       userId: session.user.id,
     });
-    // save logs
+
+    // Save logs
     await db.insert(logs).values({
       inputTokens: response.usage.input_tokens,
       outputTokens: response.usage.output_tokens,
@@ -130,34 +130,8 @@ export default defineEventHandler(async (event: H3Event) => {
   }
 });
 
-function validateMessages(messages: any): Message[] {
-  if (!Array.isArray(messages)) {
-    throw createError({
-      statusCode: 400,
-      message: "Messages must be an array",
-    });
-  }
-
-  if (messages.length === 0) {
-    throw createError({
-      statusCode: 400,
-      message: "Messages array cannot be empty",
-    });
-  }
-
-  return messages.map((message) => {
-    if (!message.role || !message.content) {
-      throw createError({
-        statusCode: 400,
-        message: "Each message must have role and content properties",
-      });
-    }
-    return message;
-  });
-}
-
-function preprocessMessages(messages: Message[]): Message[] {
+function preprocessMessages(messages: any[]) {
   return messages
-    .map(({ role, content }) => ({ role, content }))
+    .map(({ role, content }: any) => ({ role, content }))
     .slice(-MAX_MESSAGES);
 }

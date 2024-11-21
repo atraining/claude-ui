@@ -120,7 +120,7 @@ const handleSendMessage = async () => {
             const res = await $fetch('/api/chat', {
                 method: 'POST',
                 body: JSON.stringify({
-                    messages: messages.value,
+                    prompt: inputMessage.value,
                     threadId: route.params.id,
                     selectedFiles: selectedFiles.value
                 })
