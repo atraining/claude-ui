@@ -17,6 +17,7 @@ v-model="email" name="email" label="Email address" placeholder="Enter your email
                 </UFormGroup>
                 <UFormGroup label="password" label-for="password">
                     <UInput
+                    minlength="6"
 v-model="password" name="password" label="Password" placeholder="Enter your password"
                         autocomplete="new-password" type="password" size="lg" required />
                 </UFormGroup>
