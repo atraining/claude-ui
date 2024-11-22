@@ -106,23 +106,35 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // Stream the response
     for await (const chunk of stream) {
-      console.log(chunk);
       if (chunk.type === "content_block_delta") {
         fullResponse += chunk.delta?.text || "";
         // Send chunk to client
         event.node.res.write(`data: ${JSON.stringify(chunk)}\n\n`);
       }
+
+      if (chunk.type === "message_start") {
+        await db.insert(logs).values({
+          inputTokens: chunk.message.usage.input_tokens,
+          outputTokens: chunk.message.usage.output_tokens,
+          cacheCreationInputTokens:
+            chunk.message.usage.cache_creation_input_tokens,
+          cacheReadInputTokens: chunk.message.usage.cache_read_input_tokens,
+          createdAt: new Date(),
+          userId: session.user.id,
+        });
+      }
     }
 
-    // Insert complete message to database
-    await db.insert(messages).values({
-      content: fullResponse,
-      role: "assistant",
-      createdAt: new Date(),
-      threadId: body.threadId,
-      userId: session.user.id,
-    });
-
+    if (fullResponse.length > 0) {
+      // Insert complete message to database
+      await db.insert(messages).values({
+        content: fullResponse,
+        role: "assistant",
+        createdAt: new Date(),
+        threadId: body.threadId,
+        userId: session.user.id,
+      });
+    }
     // Close the stream
     event.node.res.end();
   } catch (error) {
