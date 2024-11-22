@@ -10,9 +10,9 @@
     "postinstall": "nuxt prepare && npm run db:migrate",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "lint": "yarn lint:eslint && yarn lint:prettier",
+    "lint": "npm run lint:eslint && npm run lint:prettier",
     "lint:eslint": "eslint .",
-    "lint:prettier": "prettier . --check",
+    "lint:prettier": "prettier . --check --write",
     "lint:fix": "eslint . --fix && prettier --write --list-different ."
   },
   "dependencies": {

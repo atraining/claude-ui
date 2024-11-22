@@ -73,8 +73,8 @@ export default defineEventHandler(async (event: H3Event) => {
         .where(
           and(
             eq(files.threadId, body.threadId),
-            inArray(files.id, body.selectedFiles)
-          )
+            inArray(files.id, body.selectedFiles),
+          ),
         );
 
       for (const file of selectedFiles) {

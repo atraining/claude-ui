@@ -1,6 +1,6 @@
 import db from "~/server/utils/db";
 import { eq } from "drizzle-orm";
-import { messages , threads } from "~/server/database/schema";
+import { messages, threads } from "~/server/database/schema";
 
 export default defineEventHandler(async (event) => {
   try {

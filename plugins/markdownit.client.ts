@@ -1,6 +1,6 @@
 import markdownit from "markdown-it";
-import hljs from 'highlight.js';
-import 'highlight.js/styles/github-dark.min.css';
+import hljs from "highlight.js";
+import "highlight.js/styles/github-dark.min.css";
 
 export default defineNuxtPlugin((nuxtApp) => {
   let codeBlockId = 0;
@@ -8,27 +8,32 @@ export default defineNuxtPlugin((nuxtApp) => {
   const md = markdownit({
     highlight: function (str, lang) {
       const currentId = `code-block-${codeBlockId++}`;
-      
+
       if (lang && hljs.getLanguage(lang)) {
         try {
-          const highlighted = hljs.highlight(str, { language: lang, ignoreIllegals: true }).value;
+          const highlighted = hljs.highlight(str, {
+            language: lang,
+            ignoreIllegals: true,
+          }).value;
           // Return without the surrounding pre/code tags since markdown-it will add them
           return highlighted;
         } catch (__) {}
       }
 
       return md.utils.escapeHtml(str);
-    }
+    },
   });
 
   // Override the fence renderer to add our custom wrapper
   md.renderer.rules.fence = function (tokens, idx, options, env, slf) {
     const token = tokens[idx];
-    const info = token.info ? md.utils.unescapeAll(token.info).trim() : '';
-    const lang = info ? info.split(/\s+/g)[0] : '';
+    const info = token.info ? md.utils.unescapeAll(token.info).trim() : "";
+    const lang = info ? info.split(/\s+/g)[0] : "";
     const currentId = `code-block-${codeBlockId++}`;
 
-    const code = options.highlight ? options.highlight(token.content, lang, '') : token.content;
+    const code = options.highlight
+      ? options.highlight(token.content, lang, "")
+      : token.content;
 
     const codeBlock = `
       <div class="relative code-block">
@@ -54,32 +59,33 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   // Add the copy functionality to the window object
   if (import.meta.client) {
-    window.copyCode = async function(id: string) {
+    window.copyCode = async function (id: string) {
       const codeBlock = document.getElementById(id);
       if (!codeBlock) return;
 
-      const code = codeBlock.textContent || '';
-      
+      const code = codeBlock.textContent || "";
+
       try {
         await navigator.clipboard.writeText(code);
-        
+
         // Get the button associated with this code block
-        const button = codeBlock.parentElement?.parentElement?.querySelector('.copy-button');
-        const copyIcon = button?.querySelector('.copy-icon');
-        const checkIcon = button?.querySelector('.check-icon');
-        
+        const button =
+          codeBlock.parentElement?.parentElement?.querySelector(".copy-button");
+        const copyIcon = button?.querySelector(".copy-icon");
+        const checkIcon = button?.querySelector(".check-icon");
+
         if (copyIcon && checkIcon) {
-          copyIcon.classList.add('hidden');
-          checkIcon.classList.remove('hidden');
-          
+          copyIcon.classList.add("hidden");
+          checkIcon.classList.remove("hidden");
+
           // Reset button after 2 seconds
           setTimeout(() => {
-            copyIcon.classList.remove('hidden');
-            checkIcon.classList.add('hidden');
+            copyIcon.classList.remove("hidden");
+            checkIcon.classList.add("hidden");
           }, 2000);
         }
       } catch (err) {
-        console.error('Failed to copy code:', err);
+        console.error("Failed to copy code:", err);
       }
     };
   }

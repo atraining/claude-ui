@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   const page = Math.max(1, parseInt(query.page as string) || 1);
   const pageSize = Math.max(
     1,
-    Math.min(100, parseInt(query.pageSize as string) || 10)
+    Math.min(100, parseInt(query.pageSize as string) || 10),
   );
   const offset = (page - 1) * pageSize;
 

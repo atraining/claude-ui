@@ -1,4 +1,5 @@
 # Claude UI
+
 A modern chat interface for Anthropic's Claude AI models built with Nuxt.js. Experience seamless conversations with Claude in a clean user interface.
 
 ## Prerequisites
@@ -12,6 +13,7 @@ A modern chat interface for Anthropic's Claude AI models built with Nuxt.js. Exp
 </p>
 
 ## 🌟 Features
+
 - 💾 Conversation history management
 - 🎭 Multiple Claude model support
 - 📝 Markdown and code syntax highlighting
@@ -23,6 +25,7 @@ A modern chat interface for Anthropic's Claude AI models built with Nuxt.js. Exp
 - 📝🔍 Text extraction and parsing
 
 ## Tech Stack
+
 - 🚀 Built with [Nuxt 3](https://nuxt.com/)
 - 💾 Database integration with [Drizzle ORM](https://orm.drizzle.team/)
 - 🎨 UI components from [@nuxt/ui](https://ui.nuxt.com/)

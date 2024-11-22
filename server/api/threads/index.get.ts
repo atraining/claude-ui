@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
         FROM threads t
         WHERE t.user_id = ${session.user.id}
         ORDER BY t.created_at DESC
-      `
+      `,
     );
 
     // Parse the JSON string in files column

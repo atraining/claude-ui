@@ -24,7 +24,6 @@ export default defineEventHandler(async (event) => {
       userId = thread.userId;
     }
 
-
     // Delete related records first (to maintain referential integrity)
     await db.delete(messages).where(eq(messages.threadId, id));
     // Delete files

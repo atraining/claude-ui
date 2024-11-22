@@ -1,4 +1,4 @@
-import { onMounted, onUpdated, ref, watch } from 'vue';
+import { onMounted, onUpdated, ref, watch } from "vue";
 
 export function useAutoScroll(messagesRef) {
   const containerRef = ref<HTMLElement | null>(null);
