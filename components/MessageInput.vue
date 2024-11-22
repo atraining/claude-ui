@@ -4,17 +4,14 @@
 
         <form class="flex flex-col gap-2" @submit.prevent="handleSendMessage">
             <div class="flex gap-2">
-                <UTextarea
-v-model="inputMessage" placeholder="Type your message here..."
+                <UTextarea v-model="inputMessage" placeholder="Type your message here..."
                     class="flex-grow min-w-0 bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-                    :rows="3" :auto-size="true" :max-rows="4"/>
+                    :rows="3" :auto-size="true" :max-rows="4" />
 
                 <div class="flex flex-col gap-2">
-                    <UButton
-:loading="loader" type="button" color="gray" icon="i-heroicons-paper-clip"
-                        class="flex-shrink-0" @click="triggerFileInput"/>
-                    <UButton
-:loading="loader" type="submit" color="primary" icon="i-heroicons-paper-airplane-20-solid"
+                    <UButton :loading="loader" type="button" color="gray" icon="i-heroicons-paper-clip"
+                        class="flex-shrink-0" @click="triggerFileInput" />
+                    <UButton :loading="loader" type="submit" color="primary" icon="i-heroicons-paper-airplane-20-solid"
                         class="flex-shrink-0">
                         Send
                     </UButton>
@@ -23,8 +20,7 @@ v-model="inputMessage" placeholder="Type your message here..."
         </form>
 
         <!-- Hidden file input -->
-        <input
-ref="fileInput" type="file"
+        <input ref="fileInput" type="file"
             accept=".html,.ts,.htm,.atom,.rss,.md,.markdown,.epub,.xml,.xsl,.pdf,.doc,.docx,.odt,.ott,.rtf,.xls,.xlsx,.xlsb,.xlsm,.xltx,.csv,.ods,.ots,.pptx,.potx,.odp,.otp,.odg,.otg,.png,.jpg,.jpeg,.gif,.dxf,.js,text/*"
             multiple class="hidden" @change="handleFileSelect">
     </div>
@@ -107,18 +103,30 @@ const removeFile = async (fileToRemove) => {
 
 const handleSendMessage = async () => {
     if (inputMessage.value.trim() !== '') {
-        const newMessage = {
+        // Add user message
+        const userMessage = {
             id: messages.value.length + 1,
             createdAt: new Date(),
             content: inputMessage.value,
             role: 'user'
         }
-        messages.value.push(newMessage)
+        messages.value.push(userMessage)
+
+        // Create assistant message placeholder for streaming
+        const assistantMessage = {
+            id: messages.value.length + 2,
+            createdAt: new Date(),
+            content: '',  // Will be updated as we receive chunks
+            role: 'assistant'
+        }
         loader.value = true
 
         try {
-            const res = await $fetch('/api/chat', {
+            const response = await fetch('/api/chat', {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({
                     prompt: inputMessage.value,
                     threadId: route.params.id,
@@ -126,20 +134,50 @@ const handleSendMessage = async () => {
                 })
             })
 
+            // Clear input after sending
             inputMessage.value = ''
+            const reader = response.body.getReader()
+            const decoder = new TextDecoder()
+            messages.value.push(assistantMessage)
 
-            messages.value.push({
-                id: messages.value.length + 1,
-                content: res.content[0].text,
-                createdAt: new Date(),
-                role: 'assistant'
-            })
+            try {
+                while (true) {
+                    const { done, value } = await reader.read()
+                    if (done) break
+
+                    const chunk = decoder.decode(value, { stream: true })
+                    const lines = chunk.split('\n')
+
+                    for (const line of lines) {
+                        if (line.trim() && line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(5))
+                                if (data.type === 'content_block_delta' && data.delta?.text) {
+                                    // Update the last  messages item with the new content
+                                    messages.value[messages.value.length - 1].content += data.delta.text
+                                    // delay to allow the UI to update
+                                    await new Promise(resolve => setTimeout(resolve, 100))
+                                }
+                            } catch (e) {
+                                console.error('Error parsing SSE data:', e)
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error reading stream:', error)
+                // remove assistant message
+                messages.value.pop()
+            }
         } catch (error) {
             console.error('Error sending message:', error)
-            // Handle error (maybe show a notification to user)
+
+          
         } finally {
             loader.value = false
         }
     }
 }
+
+
 </script>

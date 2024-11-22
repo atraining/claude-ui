@@ -1,3 +1,4 @@
+// /server/api/chat.post.ts
 import Anthropic from "@anthropic-ai/sdk";
 import { messageRequest } from "~/server/api/validations/chat";
 import type { H3Event } from "h3";
@@ -9,11 +10,9 @@ const MAX_MESSAGES = 4;
 
 export default defineEventHandler(async (event: H3Event) => {
   try {
-    // Require a user session (send back 401 if no `user` key in session)
     const session = await requireUserSession(event);
-
-    // Get configuration and request body
     const { anthropicKey } = useRuntimeConfig();
+
     if (!anthropicKey) {
       throw createError({
         statusCode: 500,
@@ -21,12 +20,10 @@ export default defineEventHandler(async (event: H3Event) => {
       });
     }
 
-    // Parse and validate request body using Zod
     const body = messageRequest.parse(await readBody(event));
-    // Initialize Anthropic client
     const anthropic = new Anthropic({ apiKey: anthropicKey });
 
-    // Get thread using Drizzle
+    // Get thread
     const [thread] = await db
       .select()
       .from(threads)
@@ -39,7 +36,7 @@ export default defineEventHandler(async (event: H3Event) => {
       });
     }
 
-    // Insert user message using Drizzle
+    // Insert user message
     await db.insert(messages).values({
       content: body.prompt,
       role: "user",
@@ -48,7 +45,7 @@ export default defineEventHandler(async (event: H3Event) => {
       userId: session.user.id,
     });
 
-    // Fetch last MAX_MESSAGES from the database
+    // Fetch previous messages
     const dbMessages = await db
       .select()
       .from(messages)
@@ -58,7 +55,6 @@ export default defineEventHandler(async (event: H3Event) => {
 
     const processedMessages = preprocessMessages(dbMessages);
 
-
     const systemMessage = [
       {
         type: "text",
@@ -67,8 +63,7 @@ export default defineEventHandler(async (event: H3Event) => {
       },
     ];
 
-    if (body.selectedFiles && body.selectedFiles.length > 0) {
-      // Retrieve text from files using Drizzle
+    if (body.selectedFiles?.length > 0) {
       const selectedFiles = await db
         .select({
           name: files.name,
@@ -91,38 +86,47 @@ export default defineEventHandler(async (event: H3Event) => {
       }
     }
 
-    // Make API call
-    const response = await anthropic.beta.promptCaching.messages.create({
+    // Create response headers for SSE
+    setResponseHeaders(event, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    });
+
+    const stream = await anthropic.beta.promptCaching.messages.create({
       model: thread.model || "claude-3-5-sonnet-latest",
       max_tokens: thread.maxTokens || 1024,
       messages: processedMessages,
       temperature: thread.temperature || 0.5,
       system: systemMessage,
+      stream: true,
     });
 
-    // Insert assistant message using Drizzle
+    let fullResponse = "";
+
+    // Stream the response
+    for await (const chunk of stream) {
+      console.log(chunk);
+      if (chunk.type === "content_block_delta") {
+        fullResponse += chunk.delta?.text || "";
+        // Send chunk to client
+        event.node.res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+      }
+    }
+
+    // Insert complete message to database
     await db.insert(messages).values({
-      content: response.content[0].text,
+      content: fullResponse,
       role: "assistant",
       createdAt: new Date(),
       threadId: body.threadId,
       userId: session.user.id,
     });
 
-    // Save logs
-    await db.insert(logs).values({
-      inputTokens: response.usage.input_tokens,
-      outputTokens: response.usage.output_tokens,
-      cacheCreationInputTokens: response.usage.cache_creation_input_tokens,
-      cacheReadInputTokens: response.usage.cache_read_input_tokens,
-      createdAt: new Date(),
-      userId: session.user.id,
-    });
-
-    return response;
+    // Close the stream
+    event.node.res.end();
   } catch (error) {
     console.error("Error in Anthropic API handler:", error);
-
     throw createError({
       statusCode: error.status || 500,
       message: error.message || "Internal server error",

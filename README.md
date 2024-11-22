@@ -98,6 +98,6 @@ npm run db:migrate
 
 ## Todo
 
-- [ ] Add streaming support for long-running chats
+- [x] Add streaming support for long-running chats
 - [ ] Add server-side validation for form inputs
 - [x] Add user authentication
