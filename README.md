@@ -49,6 +49,12 @@ pnpm install
 yarn install
 ```
 
+## Parsing PDFs
+Ensure `poppler-utils` is part of your environment by installing it:
+```bash
+sudo apt update
+sudo apt install poppler-utils
+```
 ## ENV
 
 Create a .env file in the root directory and add your `ANTHROPIC_KEY` API key.
