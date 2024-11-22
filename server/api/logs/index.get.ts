@@ -1,5 +1,5 @@
 import db from "~/server/utils/db";
-import { eq, count , desc } from "drizzle-orm";
+import { eq, count, desc } from "drizzle-orm";
 import { logs } from "~/server/database/schema";
 
 export default defineEventHandler(async (event) => {
@@ -29,8 +29,6 @@ export default defineEventHandler(async (event) => {
     .limit(pageSize)
     .offset(offset)
     .orderBy(desc(logs.id));
-
-  console.log(items);
 
   return {
     items,

@@ -1,27 +1,21 @@
 <template>
-    <div
-:class="[
+    <div :class="[
         'flex mb-4 max-w-full',
         message.role === 'user' ? 'justify-end' : 'justify-start'
     ]">
-        <div
-:class="[
+        <div :class="[
             'flex items-start max-w-[85%]',
             message.role === 'user' ? 'flex-row-reverse' : ''
         ]">
-            <UAvatar
-:src="message.role === 'user' ? '/user-avatar.png' : '/assistant-avatar.png'"
-                :alt="message.role === 'user' ? 'User' : 'AI'" size="sm" class="flex-shrink-0"/>
+            <UAvatar :alt="message.role === 'user' ? 'User' : 'AI'" size="sm" class="flex-shrink-0" />
             <div class="flex flex-col mx-2">
-                <div
-:class="[
+                <div :class="[
                     'px-4 py-2 rounded-lg break-words',
                     message.role === 'user'
                         ? 'bg-primary text-white dark:bg-primary-600'
                         : 'bg-gray-200 dark:bg-gray-700 dark:text-gray-100'
-                ]" v-html="$mdRenderer.render(message.content)"/>
-                <span
-:class="[
+                ]" v-html="$mdRenderer.render(message.content)" />
+                <span :class="[
                     'text-xs mt-1',
                     message.role === 'user' ? 'text-right' : 'text-left',
                     'text-gray-500 dark:text-gray-400'

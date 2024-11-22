@@ -31,6 +31,7 @@ import { ref } from 'vue'
 const route = useRoute()
 const { loader } = useLoader()
 const { messages } = useApp()
+const toast = useToast()
 
 const props = defineProps({
     attachedFiles: {
@@ -102,82 +103,107 @@ const removeFile = async (fileToRemove) => {
 }
 
 const handleSendMessage = async () => {
-    if (inputMessage.value.trim() !== '') {
-        // Add user message
-        const userMessage = {
-            id: messages.value.length + 1,
-            createdAt: new Date(),
-            content: inputMessage.value,
-            role: 'user'
-        }
-        messages.value.push(userMessage)
+    if (inputMessage.value.trim() === '') return
 
-        // Create assistant message placeholder for streaming
-        const assistantMessage = {
-            id: messages.value.length + 2,
-            createdAt: new Date(),
-            content: '',  // Will be updated as we receive chunks
-            role: 'assistant'
+    // Add user message
+    const userMessage = {
+        id: messages.value.length + 1,
+        createdAt: new Date(),
+        content: inputMessage.value,
+        role: 'user'
+    }
+    messages.value.push(userMessage)
+
+    // Create assistant message placeholder for streaming
+    const assistantMessage = {
+        id: messages.value.length + 2,
+        createdAt: new Date(),
+        content: '',  // Will be updated as we receive chunks
+        role: 'assistant'
+    }
+    messages.value.push(assistantMessage)
+
+    loader.value = true
+    const messageContent = inputMessage.value
+    inputMessage.value = '' // Clear input after sending
+
+    try {
+        // Use regular fetch for streaming
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                prompt: messageContent,
+                threadId: route.params.id,
+                selectedFiles: selectedFiles.value
+            })
+        })
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
         }
-        loader.value = true
+
+        const reader = response.body.getReader()
+        const decoder = new TextDecoder()
 
         try {
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    prompt: inputMessage.value,
-                    threadId: route.params.id,
-                    selectedFiles: selectedFiles.value
-                })
-            })
+            while (true) {
+                const { done, value } = await reader.read()
+                if (done) break
 
-            // Clear input after sending
-            inputMessage.value = ''
-            const reader = response.body.getReader()
-            const decoder = new TextDecoder()
-            messages.value.push(assistantMessage)
+                const chunk = decoder.decode(value, { stream: true })
+                const lines = chunk.split('\n')
 
-            try {
-                while (true) {
-                    const { done, value } = await reader.read()
-                    if (done) break
-
-                    const chunk = decoder.decode(value, { stream: true })
-                    const lines = chunk.split('\n')
-
-                    for (const line of lines) {
-                        if (line.trim() && line.startsWith('data: ')) {
-                            try {
-                                const data = JSON.parse(line.slice(5))
-                                if (data.type === 'content_block_delta' && data.delta?.text) {
-                                    // Update the last  messages item with the new content
-                                    messages.value[messages.value.length - 1].content += data.delta.text
-                                    // delay to allow the UI to update
-                                    await new Promise(resolve => setTimeout(resolve, 100))
-                                }
-                            } catch (e) {
-                                console.error('Error parsing SSE data:', e)
+                for (const line of lines) {
+                    if (line.trim() && line.startsWith('data: ')) {
+                        try {
+                            const data = JSON.parse(line.slice(5))
+                            if (data.type === 'content_block_delta' && data.delta?.text) {
+                                // Update the last messages item with the new content
+                                messages.value[messages.value.length - 1].content += data.delta.text
+                                // delay to allow the UI to update
+                                await new Promise(resolve => setTimeout(resolve, 100))
                             }
+                        } catch (e) {
+                            console.error('Error parsing SSE data:', e)
+                            toast.add({
+                                title: 'Error',
+                                description: 'Error parsing response data',
+                                color: 'red',
+                                timeout: 5000,
+                                icon: 'i-heroicons-exclamation-circle'
+                            })
                         }
                     }
                 }
-            } catch (error) {
-                console.error('Error reading stream:', error)
-                // remove assistant message
-                messages.value.pop()
             }
-        } catch (error) {
-            console.error('Error sending message:', error)
-
-          
-        } finally {
-            loader.value = false
+        } catch (streamError) {
+            console.error('Error reading stream:', streamError)
+            toast.add({
+                title: 'Error',
+                description: 'Error reading response stream',
+                color: 'red',
+                timeout: 5000,
+                icon: 'i-heroicons-exclamation-circle'
+            })
+            // remove assistant message on error
+            messages.value.pop()
         }
+    } catch (error) {
+        console.error('Error sending message:', error)
+        toast.add({
+            title: 'Error',
+            description: error.message || 'Failed to send message',
+            color: 'red',
+            timeout: 5000,
+            icon: 'i-heroicons-exclamation-circle'
+        })
+        // remove assistant message on error
+        messages.value.pop()
+    } finally {
+        loader.value = false
     }
 }
-
-
 </script>
