@@ -68,6 +68,7 @@ const temperature = ref(0.7);
 const maxTokens = ref(1024);
 const model = ref("claude-3-5-sonnet-latest");
 const models = [
+  "claude-sonnet-4-latest"
   "claude-3-7-sonnet-latest",
   "claude-3-5-sonnet-latest",
   "claude-3-5-haiku-latest",
