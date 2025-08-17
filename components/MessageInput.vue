@@ -1,54 +1,102 @@
 <template>
-  <div class="shrink-0 pb-4 px-4">
-    <FileAttachments :files="attachedFiles" @remove-file="removeFile" />
+  <div class="shrink-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+    <!-- File Attachments -->
+    <FileAttachments 
+      v-if="attachedFiles.length > 0" 
+      :files="attachedFiles" 
+      @remove-file="removeFile" 
+      class="px-4 pt-4"
+    />
 
-    <form class="flex flex-col gap-2" @submit.prevent="handleSendMessage">
-      <div class="flex gap-2">
-        <UTextarea
-          v-model="inputMessage"
-          placeholder="Type your message here..."
-          class="flex-grow min-w-0 bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-          :rows="3"
-          :auto-size="true"
-          :max-rows="4"
-        />
-
-        <div class="flex flex-col gap-2">
+    <!-- Input Area -->
+    <div class="p-4">
+      <form class="relative" @submit.prevent="handleSendMessage">
+        <div class="flex items-end gap-3 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-3 transition-colors focus-within:border-primary-300 dark:focus-within:border-primary-600">
+          <!-- File attachment button -->
           <UButton
-            :loading="loader"
             type="button"
             color="gray"
+            variant="ghost"
             icon="i-heroicons-paper-clip"
-            class="flex-shrink-0"
+            size="sm"
+            :disabled="loader"
             @click="triggerFileInput"
+            class="mb-1"
           />
-          <UButton
-            :loading="loader"
-            type="submit"
-            color="primary"
-            icon="i-heroicons-paper-airplane-20-solid"
-            class="flex-shrink-0"
-          >
-            Send
-          </UButton>
-        </div>
-      </div>
-    </form>
 
-    <!-- Hidden file input -->
-    <input
-      ref="fileInput"
-      type="file"
-      accept=".html,.ts,.htm,.atom,.rss,.md,.markdown,.epub,.xml,.xsl,.pdf,.doc,.docx,.odt,.ott,.rtf,.xls,.xlsx,.xlsb,.xlsm,.xltx,.csv,.ods,.ots,.pptx,.potx,.odp,.otp,.odg,.otg,.png,.jpg,.jpeg,.gif,.dxf,.js,text/*"
-      multiple
-      class="hidden"
-      @change="handleFileSelect"
-    />
+          <!-- Text input -->
+          <UTextarea
+            v-model="inputMessage"
+            placeholder="Message your AI agent..."
+            class="flex-grow min-w-0 border-0 bg-transparent resize-none focus:ring-0 px-0"
+            :rows="1"
+            :auto-size="true"
+            :max-rows="6"
+            :disabled="loader"
+            @keydown="handleKeyDown"
+          />
+
+          <!-- Send button -->
+          <UButton
+            type="submit"
+            :loading="loader"
+            :disabled="!inputMessage.trim() || loader"
+            color="primary"
+            icon="i-heroicons-paper-airplane"
+            size="sm"
+            class="mb-1 flex-shrink-0"
+          />
+        </div>
+
+        <!-- Quick suggestions (when input is empty) -->
+        <div v-if="!inputMessage.trim() && quickSuggestions.length > 0" class="mt-3">
+          <div class="flex flex-wrap gap-2">
+            <UButton
+              v-for="suggestion in quickSuggestions"
+              :key="suggestion"
+              variant="ghost"
+              size="xs"
+              color="gray"
+              @click="inputMessage = suggestion"
+              class="text-xs"
+            >
+              {{ suggestion }}
+            </UButton>
+          </div>
+        </div>
+
+        <!-- Input hints -->
+        <div class="flex items-center justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <div class="flex items-center gap-4">
+            <span>Press Shift+Enter for new line</span>
+            <span v-if="selectedFiles.length > 0" class="flex items-center gap-1">
+              <UIcon name="i-heroicons-paper-clip" class="w-3 h-3" />
+              {{ selectedFiles.length }} file{{ selectedFiles.length !== 1 ? 's' : '' }} attached
+            </span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span>{{ inputMessage.length }}</span>
+            <span>/</span>
+            <span class="text-gray-400">4000</span>
+          </div>
+        </div>
+      </form>
+
+      <!-- Hidden file input -->
+      <input
+        ref="fileInput"
+        type="file"
+        accept=".html,.ts,.htm,.atom,.rss,.md,.markdown,.epub,.xml,.xsl,.pdf,.doc,.docx,.odt,.ott,.rtf,.xls,.xlsx,.xlsb,.xlsm,.xltx,.csv,.ods,.ots,.pptx,.potx,.odp,.otp,.odg,.otg,.png,.jpg,.jpeg,.gif,.dxf,.js,text/*"
+        multiple
+        class="hidden"
+        @change="handleFileSelect"
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 const route = useRoute();
 const { loader } = useLoader();
 const { messages } = useApp();
@@ -67,9 +115,13 @@ const emit = defineEmits(["update:attachedFiles", "send-message"]);
 const inputMessage = ref("");
 const fileInput = ref(null);
 
-const triggerFileInput = () => {
-  fileInput.value.click();
-};
+// Quick suggestion prompts
+const quickSuggestions = ref([
+  "Explain this concept",
+  "Write a summary", 
+  "Help me debug this",
+  "What are the best practices?"
+]);
 
 const selectedFiles = computed(() => {
   return (props.attachedFiles || [])
@@ -77,14 +129,40 @@ const selectedFiles = computed(() => {
     .map((file) => file.id);
 });
 
+const triggerFileInput = () => {
+  fileInput.value?.click();
+};
+
+const handleKeyDown = (event) => {
+  // Send on Enter (but not Shift+Enter)
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    handleSendMessage();
+  }
+};
+
 const handleFileSelect = async (event) => {
   const files = Array.from(event.target.files);
+  if (!files.length) return;
+
   loader.value = true;
 
   try {
     for (const file of files) {
+      // Check file size (limit to 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.add({
+          title: "File too large",
+          description: `${file.name} is larger than 10MB`,
+          color: "red",
+          icon: "i-heroicons-exclamation-triangle",
+        });
+        continue;
+      }
+
       const formData = new FormData();
       formData.append("file", file);
+      
       const fileReq = await $fetch(`/api/threads/${route.params.id}/files`, {
         method: "post",
         body: formData,
@@ -99,9 +177,22 @@ const handleFileSelect = async (event) => {
       };
 
       emit("update:attachedFiles", [...props.attachedFiles, newFile]);
+      
+      toast.add({
+        title: "File uploaded",
+        description: `${file.name} has been processed`,
+        color: "green",
+        icon: "i-heroicons-document-check",
+      });
     }
   } catch (error) {
     console.error("Error uploading files:", error);
+    toast.add({
+      title: "Upload failed",
+      description: "Could not upload one or more files",
+      color: "red",
+      icon: "i-heroicons-exclamation-triangle",
+    });
   } finally {
     fileInput.value.value = ""; // Reset file input
     loader.value = false;
@@ -118,19 +209,43 @@ const removeFile = async (fileToRemove) => {
       "update:attachedFiles",
       props.attachedFiles.filter((file) => file !== fileToRemove),
     );
+    
+    toast.add({
+      title: "File removed",
+      description: `${fileToRemove.name} has been removed`,
+      color: "green",
+      icon: "i-heroicons-trash",
+    });
   } catch (error) {
     console.error("Error removing file:", error);
+    toast.add({
+      title: "Remove failed", 
+      description: "Could not remove file",
+      color: "red",
+      icon: "i-heroicons-exclamation-triangle",
+    });
   } finally {
     loader.value = false;
   }
 };
 
 const handleSendMessage = async () => {
-  if (inputMessage.value.trim() === "") return;
+  if (inputMessage.value.trim() === "" || loader.value) return;
+
+  // Check message length
+  if (inputMessage.value.length > 4000) {
+    toast.add({
+      title: "Message too long",
+      description: "Please keep messages under 4000 characters",
+      color: "orange",
+      icon: "i-heroicons-exclamation-triangle",
+    });
+    return;
+  }
 
   // Add user message
   const userMessage = {
-    id: messages.value.length + 1,
+    id: Date.now() + Math.random(), // Temporary ID
     createdAt: new Date(),
     content: inputMessage.value,
     role: "user",
@@ -139,9 +254,9 @@ const handleSendMessage = async () => {
 
   // Create assistant message placeholder for streaming
   const assistantMessage = {
-    id: messages.value.length + 2,
+    id: Date.now() + Math.random() + 1,
     createdAt: new Date(),
-    content: "", // Will be updated as we receive chunks
+    content: "",
     role: "assistant",
   };
   messages.value.push(assistantMessage);
@@ -168,7 +283,11 @@ const handleSendMessage = async () => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const reader = response.body.getReader();
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error("Response body is not readable");
+    }
+    
     const decoder = new TextDecoder();
 
     try {
@@ -184,21 +303,16 @@ const handleSendMessage = async () => {
             try {
               const data = JSON.parse(line.slice(5));
               if (data.type === "content_block_delta" && data.delta?.text) {
-                // Update the last messages item with the new content
-                messages.value[messages.value.length - 1].content +=
-                  data.delta.text;
-                // delay to allow the UI to update
-                await new Promise((resolve) => setTimeout(resolve, 100));
+                // Update the last message with the new content
+                const lastMessage = messages.value[messages.value.length - 1];
+                if (lastMessage.role === 'assistant') {
+                  lastMessage.content += data.delta.text;
+                }
+                // Small delay to allow UI updates
+                await new Promise((resolve) => setTimeout(resolve, 10));
               }
             } catch (e) {
               console.error("Error parsing SSE data:", e);
-              toast.add({
-                title: "Error",
-                description: "Error parsing response data",
-                color: "red",
-                timeout: 5000,
-                icon: "i-heroicons-exclamation-circle",
-              });
             }
           }
         }
@@ -206,26 +320,27 @@ const handleSendMessage = async () => {
     } catch (streamError) {
       console.error("Error reading stream:", streamError);
       toast.add({
-        title: "Error",
-        description: "Error reading response stream",
+        title: "Streaming error",
+        description: "Lost connection while receiving response",
         color: "red",
-        timeout: 5000,
         icon: "i-heroicons-exclamation-circle",
       });
-      // remove assistant message on error
+      // Remove assistant message on error
       messages.value.pop();
     }
   } catch (error) {
     console.error("Error sending message:", error);
     toast.add({
-      title: "Error",
-      description: error.message || "Failed to send message",
+      title: "Failed to send",
+      description: error.message || "Could not send message",
       color: "red",
-      timeout: 5000,
-      icon: "i-heroicons-exclamation-circle",
+      icon: "i-heroicons-exclamation-triangle",
     });
-    // remove assistant message on error
+    // Remove both user and assistant messages on error
     messages.value.pop();
+    messages.value.pop();
+    // Restore the input message
+    inputMessage.value = messageContent;
   } finally {
     loader.value = false;
   }

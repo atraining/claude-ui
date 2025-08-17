@@ -13,10 +13,10 @@ export default defineEventHandler(async (event: H3Event) => {
     const session = await requireUserSession(event);
     const { anthropicKey } = useRuntimeConfig();
 
-    if (!anthropicKey) {
+    if (!anthropicKey || anthropicKey === 'your_anthropic_api_key_here') {
       throw createError({
         statusCode: 500,
-        message: "Anthropic API key is not configured",
+        message: "Anthropic API key is not configured. Please set the ANTHROPIC_KEY environment variable.",
       });
     }
 
@@ -94,7 +94,7 @@ export default defineEventHandler(async (event: H3Event) => {
     });
 
     const stream = await anthropic.beta.promptCaching.messages.create({
-      model: thread.model || "claude-3-5-sonnet-latest",
+      model: thread.model || "claude-3-5-sonnet-20241022",
       max_tokens: thread.maxTokens || 1024,
       messages: processedMessages,
       temperature: thread.temperature || 0.5,

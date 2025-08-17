@@ -11,6 +11,13 @@ export default defineEventHandler(async (event) => {
     // Get configuration and request body
     const { anthropicKey } = useRuntimeConfig();
 
+    if (!anthropicKey || anthropicKey === 'your_anthropic_api_key_here') {
+      throw createError({
+        statusCode: 500,
+        message: "Anthropic API key is not configured. Please set the ANTHROPIC_KEY environment variable.",
+      });
+    }
+
     // Initialize Anthropic client
     const anthropic = new Anthropic({
       apiKey: anthropicKey,
@@ -65,7 +72,7 @@ export default defineEventHandler(async (event) => {
     console.error("Error parsing file:", error);
     throw createError({
       statusCode: 500,
-      message: "Error parsing file",
+      message: error.message || "Error parsing file",
     });
   }
 });

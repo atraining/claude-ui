@@ -49,6 +49,25 @@ pnpm install
 yarn install
 ```
 
+## Environment Configuration
+
+Create a `.env` file in the root directory and add your Anthropic API key:
+
+```bash
+# Required: Get your API key from https://console.anthropic.com/
+ANTHROPIC_KEY=your_anthropic_api_key_here
+
+# Optional: Custom database path (defaults to ./database.db)
+DATABASE_URL=./database.db
+```
+
+**To get your Anthropic API key:**
+1. Visit [https://console.anthropic.com/](https://console.anthropic.com/)
+2. Sign up or log in to your account
+3. Navigate to API Keys section
+4. Create a new API key
+5. Copy the key and paste it in your `.env` file
+
 ## Parsing PDFs
 Ensure `poppler-utils` is part of your environment by installing it:
 ```bash
@@ -57,7 +76,7 @@ sudo apt install poppler-utils
 ```
 ## ENV
 
-Create a .env file in the root directory and add your `ANTHROPIC_KEY` API key.
+Create a .env file in the root directory and add your `ANTHROPIC_KEY` API key as shown above in the Setup section.
 
 ## Development Server
 

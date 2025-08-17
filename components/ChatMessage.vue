@@ -1,40 +1,101 @@
 <template>
   <div
     :class="[
-      'flex mb-4 max-w-full',
+      'flex mb-6 max-w-full group',
       message.role === 'user' ? 'justify-end' : 'justify-start',
     ]"
   >
     <div
       :class="[
-        'flex items-start max-w-[85%]',
+        'flex items-start max-w-[85%] gap-3',
         message.role === 'user' ? 'flex-row-reverse' : '',
       ]"
     >
-      <UAvatar
-        :alt="message.role === 'user' ? 'User' : 'AI'"
-        size="sm"
-        class="flex-shrink-0"
-      />
-      <div class="flex flex-col mx-2">
+      <!-- Avatar -->
+      <div class="flex-shrink-0">
         <div
           :class="[
-            'px-4 py-2 rounded-lg break-words',
+            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
             message.role === 'user'
-              ? 'bg-primary text-white dark:bg-primary-600'
-              : 'bg-gray-200 dark:bg-gray-700 dark:text-gray-100',
-          ]"
-          v-html="$mdRenderer.render(message.content)"
-        />
-        <span
-          :class="[
-            'text-xs mt-1',
-            message.role === 'user' ? 'text-right' : 'text-left',
-            'text-gray-500 dark:text-gray-400',
+              ? 'bg-primary-500 text-white'
+              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
           ]"
         >
-          {{ relativeTime }}
-        </span>
+          <UIcon
+            :name="message.role === 'user' ? 'i-heroicons-user' : 'i-heroicons-cpu-chip'"
+            class="w-4 h-4"
+          />
+        </div>
+      </div>
+
+      <!-- Message Content -->
+      <div class="flex flex-col min-w-0 flex-1">
+        <!-- Message Bubble -->
+        <div
+          :class="[
+            'px-4 py-3 rounded-2xl break-words shadow-sm border transition-all duration-200',
+            message.role === 'user'
+              ? 'bg-primary-500 text-white border-primary-600 dark:bg-primary-600 dark:border-primary-700'
+              : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700 hover:shadow-md',
+          ]"
+        >
+          <!-- Typing indicator for streaming messages -->
+          <div v-if="isStreaming && message.role === 'assistant'" class="flex items-center gap-2 mb-2">
+            <div class="flex gap-1">
+              <div class="w-2 h-2 bg-primary-500 rounded-full animate-pulse"></div>
+              <div class="w-2 h-2 bg-primary-500 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+              <div class="w-2 h-2 bg-primary-500 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400">Claude is thinking...</span>
+          </div>
+
+          <!-- Message content -->
+          <div
+            :class="[
+              'prose prose-sm max-w-none',
+              message.role === 'user'
+                ? 'prose-invert'
+                : 'dark:prose-invert prose-gray',
+            ]"
+            v-html="$mdRenderer.render(message.content || '')"
+          />
+        </div>
+
+        <!-- Message Footer -->
+        <div
+          :class="[
+            'flex items-center justify-between mt-2 px-2',
+            message.role === 'user' ? 'flex-row-reverse' : '',
+          ]"
+        >
+          <!-- Timestamp -->
+          <span class="text-xs text-gray-500 dark:text-gray-400">
+            {{ relativeTime }}
+          </span>
+
+          <!-- Action buttons (visible on hover) -->
+          <div 
+            v-if="message.role === 'assistant'" 
+            class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <UButton
+              size="xs"
+              variant="ghost"
+              color="gray"
+              icon="i-heroicons-clipboard"
+              @click="copyToClipboard"
+              class="hover:bg-gray-100 dark:hover:bg-gray-700"
+            />
+            <UButton
+              size="xs"
+              variant="ghost"
+              color="gray"
+              icon="i-heroicons-arrow-path"
+              @click="regenerateResponse"
+              class="hover:bg-gray-100 dark:hover:bg-gray-700"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -43,18 +104,27 @@
 <script setup>
 import { computed } from "vue";
 const { $mdRenderer } = useNuxtApp();
+const toast = useToast();
 
 const props = defineProps({
   message: {
     type: Object,
     required: true,
     validator: (value) => {
-      return value.role && value.content && value.createdAt;
+      return value.role && value.content !== undefined;
     },
+  },
+  isStreaming: {
+    type: Boolean,
+    default: false,
   },
 });
 
+const emit = defineEmits(['regenerate']);
+
 const relativeTime = computed(() => {
+  if (!props.message.createdAt) return 'now';
+  
   const now = new Date();
   const createdAt = new Date(props.message.createdAt);
   const diffInSeconds = Math.floor((now - createdAt) / 1000);
@@ -81,4 +151,27 @@ const relativeTime = computed(() => {
   // For older messages, show the actual date
   return createdAt.toLocaleDateString();
 });
+
+const copyToClipboard = async () => {
+  try {
+    await navigator.clipboard.writeText(props.message.content);
+    toast.add({
+      title: "Copied to clipboard",
+      icon: "i-heroicons-clipboard-document-check",
+      color: "green",
+    });
+  } catch (error) {
+    console.error("Failed to copy to clipboard:", error);
+    toast.add({
+      title: "Failed to copy",
+      description: "Could not copy message to clipboard",
+      icon: "i-heroicons-exclamation-triangle",
+      color: "red",
+    });
+  }
+};
+
+const regenerateResponse = () => {
+  emit('regenerate', props.message);
+};
 </script>

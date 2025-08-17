@@ -1,13 +1,32 @@
 <template>
   <div
     ref="messagesContainer"
-    class="flex-1 overflow-y-auto overflow-x-hidden p-4"
+    class="flex-1 overflow-y-auto overflow-x-hidden px-4 py-6 bg-gray-50 dark:bg-gray-900/50"
   >
-    <ChatMessage
-      v-for="message in messages"
-      :key="message.id"
-      :message="message"
-    />
+    <!-- Empty state -->
+    <div v-if="messages.length === 0" class="h-full flex items-center justify-center">
+      <div class="text-center max-w-sm">
+        <UIcon name="i-heroicons-chat-bubble-left-ellipsis" class="w-16 h-16 text-gray-400 mx-auto mb-4" />
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Start a conversation</h3>
+        <p class="text-gray-500 dark:text-gray-400">
+          Send a message to begin chatting with your AI agent.
+        </p>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div v-else class="max-w-4xl mx-auto">
+      <ChatMessage
+        v-for="(message, index) in messages"
+        :key="message.id || index"
+        :message="message"
+        :is-streaming="isLastAssistantMessage(message, index) && isStreaming"
+        @regenerate="handleRegenerate"
+      />
+      
+      <!-- Scroll anchor -->
+      <div ref="scrollAnchor" class="h-1"></div>
+    </div>
   </div>
 </template>
 
@@ -19,20 +38,52 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  isStreaming: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const messagesContainer = ref(null);
+const emit = defineEmits(['regenerate']);
 
-watch(
-  () => props.messages,
-  () => {
+const messagesContainer = ref(null);
+const scrollAnchor = ref(null);
+
+const scrollToBottom = () => {
+  if (messagesContainer.value) {
     nextTick(() => {
-      if (messagesContainer.value) {
-        messagesContainer.value.scrollTop =
-          messagesContainer.value.scrollHeight;
-      }
+      messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
     });
+  }
+};
+
+const isLastAssistantMessage = (message, index) => {
+  return (
+    message.role === 'assistant' && 
+    index === props.messages.length - 1
+  );
+};
+
+const handleRegenerate = (message) => {
+  emit('regenerate', message);
+};
+
+// Watch for new messages and auto-scroll
+watch(
+  () => [props.messages.length, props.isStreaming],
+  () => {
+    scrollToBottom();
   },
-  { deep: true },
+  { deep: true }
+);
+
+// Watch for message content changes (streaming updates)
+watch(
+  () => props.messages.map(m => m.content).join(''),
+  () => {
+    if (props.isStreaming) {
+      scrollToBottom();
+    }
+  }
 );
 </script>
