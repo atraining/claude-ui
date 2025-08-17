@@ -1,49 +1,8 @@
 <template>
   <div class="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-    <Sidebar />
+    <Sidebar ref="sidebar" />
     
     <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
-      <!-- Thread Header -->
-      <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="flex-shrink-0">
-              <div :class="[
-                'w-3 h-3 rounded-full',
-                getModelColor(currentThread?.model)
-              ]"></div>
-            </div>
-            <div class="min-w-0">
-              <h1 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                {{ currentThread?.name || 'AI Agent' }}
-              </h1>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ getModelName(currentThread?.model) }}
-                <span v-if="currentThread?.maxTokens">• Max tokens: {{ currentThread.maxTokens }}</span>
-                <span v-if="currentThread?.temperature">• Creativity: {{ currentThread.temperature }}</span>
-              </p>
-            </div>
-          </div>
-          
-          <!-- Thread Actions -->
-          <div class="flex items-center gap-2">
-            <UButton
-              variant="ghost"
-              color="gray"
-              icon="i-heroicons-cog-6-tooth"
-              size="sm"
-              @click="showSettings = true"
-            />
-            <UButton
-              variant="ghost"
-              color="red"
-              icon="i-heroicons-trash"
-              size="sm"
-              @click="confirmDelete = true"
-            />
-          </div>
-        </div>
-      </div>
 
       <!-- Messages List Component -->
       <MessageList 
@@ -92,6 +51,7 @@ const { getThread, messages } = useApp();
 const { loader } = useLoader();
 const toast = useToast();
 
+const sidebar = ref(null);
 const attachedFiles = ref([]);
 const currentThread = ref(null);
 const isStreaming = ref(false);

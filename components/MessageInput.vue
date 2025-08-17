@@ -1,96 +1,84 @@
 <template>
-  <div class="shrink-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-    <!-- File Attachments -->
-    <FileAttachments 
-      v-if="attachedFiles.length > 0" 
-      :files="attachedFiles" 
-      @remove-file="removeFile" 
-      class="px-4 pt-4"
-    />
-
-    <!-- Input Area -->
-    <div class="p-4">
-      <form class="relative" @submit.prevent="handleSendMessage">
-        <div class="flex items-end gap-3 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-3 transition-colors focus-within:border-primary-300 dark:focus-within:border-primary-600">
-          <!-- File attachment button -->
-          <UButton
-            type="button"
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-paper-clip"
-            size="sm"
-            :disabled="loader"
-            @click="triggerFileInput"
-            class="mb-1"
-          />
-
-          <!-- Text input -->
-          <UTextarea
-            v-model="inputMessage"
-            placeholder="Message your AI agent..."
-            class="flex-grow min-w-0 border-0 bg-transparent resize-none focus:ring-0 px-0"
-            :rows="1"
-            :auto-size="true"
-            :max-rows="6"
-            :disabled="loader"
-            @keydown="handleKeyDown"
-          />
-
-          <!-- Send button -->
-          <UButton
-            type="submit"
-            :loading="loader"
-            :disabled="!inputMessage.trim() || loader"
-            color="primary"
-            icon="i-heroicons-paper-airplane"
-            size="sm"
-            class="mb-1 flex-shrink-0"
-          />
-        </div>
-
-        <!-- Quick suggestions (when input is empty) -->
-        <div v-if="!inputMessage.trim() && quickSuggestions.length > 0" class="mt-3">
-          <div class="flex flex-wrap gap-2">
+  <div class="shrink-0 bg-white dark:bg-gray-900">
+    <!-- Input container -->
+    <div class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-2 lg:px-4 py-3 lg:py-4">
+      <div class="max-w-5xl lg:max-w-6xl mx-auto">
+        <!-- File attachments -->
+        <FileAttachments
+          v-if="attachedFiles.length > 0"
+          :files="attachedFiles"
+          @remove="removeFile"
+          class="mb-3"
+        />
+        
+        <!-- Input Area -->
+        <form class="relative" @submit.prevent="handleSendMessage">
+          <div class="flex items-end gap-3 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-3 transition-colors focus-within:border-primary-300 dark:focus-within:border-primary-600">
+            <!-- File attachment button -->
             <UButton
-              v-for="suggestion in quickSuggestions"
-              :key="suggestion"
-              variant="ghost"
-              size="xs"
+              type="button"
               color="gray"
-              @click="inputMessage = suggestion"
-              class="text-xs"
-            >
-              {{ suggestion }}
-            </UButton>
-          </div>
-        </div>
+              variant="ghost"
+              icon="i-heroicons-paper-clip"
+              size="sm"
+              :disabled="loader"
+              @click="triggerFileInput"
+              class="mb-1"
+            />
 
-        <!-- Input hints -->
-        <div class="flex items-center justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
-          <div class="flex items-center gap-4">
-            <span>Press Shift+Enter for new line</span>
-            <span v-if="selectedFiles.length > 0" class="flex items-center gap-1">
-              <UIcon name="i-heroicons-paper-clip" class="w-3 h-3" />
-              {{ selectedFiles.length }} file{{ selectedFiles.length !== 1 ? 's' : '' }} attached
-            </span>
-          </div>
-          <div class="flex items-center gap-1">
-            <span>{{ inputMessage.length }}</span>
-            <span>/</span>
-            <span class="text-gray-400">4000</span>
-          </div>
-        </div>
-      </form>
+            <!-- Text input -->
+            <UTextarea
+              v-model="inputMessage"
+              placeholder="Message your AI agent..."
+              class="flex-grow min-w-0 border-0 bg-transparent resize-none focus:ring-0 px-0"
+              :rows="1"
+              :auto-size="true"
+              :max-rows="6"
+              :disabled="loader"
+              @keydown="handleKeyDown"
+            />
 
-      <!-- Hidden file input -->
-      <input
-        ref="fileInput"
-        type="file"
-        accept=".html,.ts,.htm,.atom,.rss,.md,.markdown,.epub,.xml,.xsl,.pdf,.doc,.docx,.odt,.ott,.rtf,.xls,.xlsx,.xlsb,.xlsm,.xltx,.csv,.ods,.ots,.pptx,.potx,.odp,.otp,.odg,.otg,.png,.jpg,.jpeg,.gif,.dxf,.js,text/*"
-        multiple
-        class="hidden"
-        @change="handleFileSelect"
-      />
+            <!-- Send button -->
+            <UButton
+              type="submit"
+              :loading="loader"
+              :disabled="!inputMessage.trim() || loader"
+              color="primary"
+              icon="i-heroicons-paper-airplane"
+              size="sm"
+              class="mb-1 flex-shrink-0"
+            />
+          </div>
+
+          
+
+          <!-- Input hints -->
+          <div class="flex items-center justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <div class="flex items-center gap-4">
+              <span>Press Shift+Enter for new line</span>
+              <span v-if="selectedFiles.length > 0" class="flex items-center gap-1">
+                <UIcon name="i-heroicons-paper-clip" class="w-3 h-3" />
+                {{ selectedFiles.length }} file{{ selectedFiles.length !== 1 ? 's' : '' }} attached
+              </span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span>{{ inputMessage.length }}</span>
+              <span>/</span>
+              <span class="text-gray-400">4000</span>
+            </div>
+          </div>
+        </form>
+
+        <!-- Hidden file input -->
+        <input
+          ref="fileInput"
+          type="file"
+          accept=".html,.ts,.htm,.atom,.rss,.md,.markdown,.epub,.xml,.xsl,.pdf,.doc,.docx,.odt,.ott,.rtf,.xls,.xlsx,.xlsb,.xlsm,.xltx,.csv,.ods,.ots,.pptx,.potx,.odp,.otp,.odg,.otg,.png,.jpg,.jpeg,.gif,.dxf,.js,text/*"
+          multiple
+          class="hidden"
+          @change="handleFileSelect"
+        />
+      </div>
     </div>
   </div>
 </template>

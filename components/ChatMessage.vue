@@ -1,13 +1,13 @@
 <template>
   <div
     :class="[
-      'flex mb-6 max-w-full group',
+      'flex mb-4 lg:mb-6 max-w-full group',
       message.role === 'user' ? 'justify-end' : 'justify-start',
     ]"
   >
     <div
       :class="[
-        'flex items-start max-w-[85%] gap-3',
+        'flex items-start max-w-[90%] lg:max-w-[85%] gap-2 lg:gap-3',
         message.role === 'user' ? 'flex-row-reverse' : '',
       ]"
     >
@@ -15,7 +15,7 @@
       <div class="flex-shrink-0">
         <div
           :class="[
-            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
+            'w-6 h-6 lg:w-8 lg:h-8 rounded-full flex items-center justify-center text-sm font-medium',
             message.role === 'user'
               ? 'bg-primary-500 text-white'
               : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
@@ -23,7 +23,7 @@
         >
           <UIcon
             :name="message.role === 'user' ? 'i-heroicons-user' : 'i-heroicons-cpu-chip'"
-            class="w-4 h-4"
+            class="w-3 h-3 lg:w-4 lg:h-4"
           />
         </div>
       </div>
@@ -33,7 +33,7 @@
         <!-- Message Bubble -->
         <div
           :class="[
-            'px-4 py-3 rounded-2xl break-words shadow-sm border transition-all duration-200',
+            'px-3 lg:px-4 py-2 lg:py-3 rounded-2xl break-words shadow-sm border transition-all duration-200',
             message.role === 'user'
               ? 'bg-primary-500 text-white border-primary-600 dark:bg-primary-600 dark:border-primary-700'
               : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700 hover:shadow-md',
@@ -64,7 +64,7 @@
         <!-- Message Footer -->
         <div
           :class="[
-            'flex items-center justify-between mt-2 px-2',
+            'flex items-center justify-between mt-1 lg:mt-2 px-1 lg:px-2',
             message.role === 'user' ? 'flex-row-reverse' : '',
           ]"
         >
