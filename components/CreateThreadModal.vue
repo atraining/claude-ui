@@ -56,7 +56,7 @@
               v-model="systemMessage"
               :required="true"
               placeholder="You are a helpful assistant specialized in..."
-              :rows="4"
+              :rows="2"
               resize
             />
           </UFormGroup>
