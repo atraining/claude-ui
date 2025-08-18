@@ -9,7 +9,7 @@ A modern chat interface for Anthropic's Claude AI models built with Nuxt.js. Exp
 - Anthropic API key
 
 <p align="center">
-  <img src="./public/1.PNG" alt="Claude UI Screenshot">
+  <img src="./public/ui.png" alt="Claude UI Screenshot">
 </p>
 
 ## 🌟 Features
