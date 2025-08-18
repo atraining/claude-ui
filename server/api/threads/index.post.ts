@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
       name: body.name,
       systemMessage: body.systemMessage,
       temperature: body.temperature,
-      model: body.model,
+  model: body.model,
       maxTokens: body.maxTokens,
       createdAt: new Date(),
       userId: session.user.id,

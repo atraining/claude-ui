@@ -10,6 +10,8 @@ export default defineEventHandler(async (event) => {
         SELECT 
           t.id,
           t.name,
+          t.model as model,
+          t.created_at as createdAt,
           (
             SELECT json_group_array(
               json_object(

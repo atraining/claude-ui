@@ -8,6 +8,13 @@ import db from "~/server/utils/db";
 
 const MAX_MESSAGES = 4;
 
+
+function resolveAnthropicModel(model?: string): string {
+  const fallback = "claude-3-5-sonnet-20241022";
+  if (!model) return fallback;
+  return model;
+}
+
 export default defineEventHandler(async (event: H3Event) => {
   try {
     const session = await requireUserSession(event);
@@ -94,7 +101,7 @@ export default defineEventHandler(async (event: H3Event) => {
     });
 
     const stream = await anthropic.beta.promptCaching.messages.create({
-      model: thread.model || "claude-3-5-sonnet-20241022",
+      model: resolveAnthropicModel(thread.model),
       max_tokens: thread.maxTokens || 1024,
       messages: processedMessages,
       temperature: thread.temperature || 0.5,

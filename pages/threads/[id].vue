@@ -82,7 +82,11 @@ const getModelName = (model) => {
     'claude-3-5-haiku-20241022': 'Claude 3.5 Haiku',
     'claude-3-opus-20240229': 'Claude 3 Opus',
     'claude-3-sonnet-20240229': 'Claude 3 Sonnet',
-    'claude-3-haiku-20240307': 'Claude 3 Haiku'
+  'claude-3-haiku-20240307': 'Claude 3 Haiku',
+  // New models / aliases
+  'claude-3-7-sonnet-latest': 'Claude 3.7 Sonnet',
+  'claude-4-sonnet-latest': 'Claude 4 Sonnet',
+  'claude-4.1-opus-latest': 'Claude 4.1 Opus'
   };
   return modelMap[model] || model || 'Claude 3.5 Sonnet';
 };

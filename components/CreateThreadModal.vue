@@ -159,7 +159,7 @@ const name = ref("");
 const systemMessage = ref("You are a helpful AI assistant. Provide clear, accurate, and helpful responses while being concise and engaging.");
 const temperature = ref(0.7);
 const maxTokens = ref(2048);
-const model = ref("claude-3-5-sonnet-20241022");
+const model = ref("claude-3-7-sonnet-latest");
 const isCreating = ref(false);
 
 const modelOptions = [
@@ -192,6 +192,25 @@ const modelOptions = [
     name: "Claude 3 Haiku", 
     description: "Fastest responses for simple tasks",
     tier: "fast"
+  },
+  // Newer/alias models (ensure your Anthropic account supports these IDs)
+  {
+    value: "claude-3-7-sonnet-latest",
+    name: "Claude 3.7 Sonnet",
+    description: "Improved reasoning and quality (latest Sonnet series)",
+    tier: "latest"
+  },
+  {
+    value: "claude-4-sonnet-latest",
+    name: "Claude 4 Sonnet",
+    description: "Next-gen Sonnet for advanced tasks",
+    tier: "latest"
+  },
+  {
+    value: "claude-4.1-opus-latest",
+    name: "Claude 4.1 Opus",
+    description: "Most capable Opus with cutting-edge performance",
+    tier: "powerful"
   }
 ];
 
@@ -226,7 +245,7 @@ const handleCreateThread = async () => {
     systemMessage.value = "You are a helpful AI assistant. Provide clear, accurate, and helpful responses while being concise and engaging.";
     temperature.value = 0.7;
     maxTokens.value = 2048;
-    model.value = "claude-3-5-sonnet-20241022";
+  model.value = "claude-3-7-sonnet-latest";
   } catch (error) {
     console.error("Error creating thread:", error);
     // You might want to show a toast notification here
