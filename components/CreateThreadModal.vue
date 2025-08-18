@@ -1,78 +1,41 @@
 <template>
   <UModal v-model="isModalOpen" :ui="{ width: 'w-full sm:max-w-2xl' }">
-    <UCard
-      :ui="{
-        ring: '',
-        divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-        header: { padding: 'px-6 py-4' },
-        body: { padding: 'px-6 py-4' },
-      }"
-    >
+    <UCard :ui="{
+      ring: '',
+      divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+      header: { padding: 'px-6 py-4' },
+      body: { padding: 'px-6 py-4' },
+    }">
       <template #header>
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            <UIcon
-              name="i-heroicons-sparkles"
-              class="w-5 h-5 inline mr-2 text-primary-500"
-            />
+            <UIcon name="i-heroicons-sparkles" class="w-5 h-5 inline mr-2 text-primary-500" />
             Create New AI Agent
           </h3>
-          <UButton
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-x-mark-20-solid"
-            class="-my-1"
-            @click="closeModal"
-          />
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="closeModal" />
         </div>
       </template>
 
       <template #default>
         <UForm class="space-y-6" @submit="handleCreateThread">
           <!-- Agent Name -->
-          <UFormGroup
-            label="Agent Name"
-            label-for="name"
-            description="Give your AI agent a memorable name"
-          >
-            <UInput
-              id="name"
-              v-model="name"
-              :required="true"
-              placeholder="e.g., Code Assistant, Writing Helper, Data Analyst"
-              icon="i-heroicons-user-circle"
-              size="lg"
-            />
+          <UFormGroup label="Agent Name" label-for="name" description="Give your AI agent a memorable name">
+            <UInput id="name" v-model="name" :required="true"
+              placeholder="e.g., Code Assistant, Writing Helper, Data Analyst" icon="i-heroicons-user-circle"
+              size="lg" />
           </UFormGroup>
 
           <!-- Instructions -->
-          <UFormGroup
-            label="System Instructions"
-            label-for="systemMessage"
-            description="Define how your AI agent should behave and respond"
-          >
-            <UTextarea
-              id="systemMessage"
-              v-model="systemMessage"
-              :required="true"
-              placeholder="You are a helpful assistant specialized in..."
-              :rows="2"
-              resize
-            />
+          <UFormGroup label="System Instructions" label-for="systemMessage"
+            description="Define how your AI agent should behave and respond">
+            <UTextarea id="systemMessage" v-model="systemMessage" :required="true"
+              placeholder="You are a helpful assistant specialized in..." :rows="2" resize />
           </UFormGroup>
 
           <!-- Model Selection -->
-          <UFormGroup
-            label="AI Model"
-            description="Choose the Claude model that best fits your needs"
-          >
-            <USelectMenu
-              v-model="model"
-              :options="modelOptions"
-              option-attribute="name"
-              value-attribute="value"
-              size="lg"
-            >
+          <UFormGroup label="AI Model" description="Choose the Claude model that best fits your needs">
+            <USelectMenu v-model="model" :options="modelOptions" option-attribute="name" value-attribute="value"
+              size="lg">
               <template #option="{ option }">
                 <div class="flex items-center justify-between w-full">
                   <div>
@@ -81,16 +44,12 @@
                       {{ option.description }}
                     </p>
                   </div>
-                  <UBadge
-                    :color="
-                      option.tier === 'latest'
-                        ? 'primary'
-                        : option.tier === 'fast'
-                          ? 'green'
-                          : 'gray'
-                    "
-                    size="xs"
-                  >
+                  <UBadge :color="option.tier === 'latest'
+                      ? 'primary'
+                      : option.tier === 'fast'
+                        ? 'green'
+                        : 'gray'
+                    " size="xs">
                     {{ option.tier }}
                   </UBadge>
                 </div>
@@ -99,45 +58,24 @@
           </UFormGroup>
 
           <!-- Advanced Settings -->
-          <UAccordion
-            :items="[
-              {
-                label: 'Advanced Settings',
-                icon: 'i-heroicons-cog-6-tooth',
-                slot: 'advanced',
-              },
-            ]"
-            :ui="{ wrapper: 'w-full' }"
-          >
+          <UAccordion :items="[
+            {
+              label: 'Advanced Settings',
+              icon: 'i-heroicons-cog-6-tooth',
+              slot: 'advanced',
+            },
+          ]" :ui="{ wrapper: 'w-full' }">
             <template #advanced>
               <div class="space-y-4 pt-4">
                 <!-- Max Tokens and Temperature Row -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <UFormGroup
-                    label="Max Response Tokens"
-                    description="Limit the length of responses"
-                  >
-                    <UInput
-                      v-model="maxTokens"
-                      type="number"
-                      min="10"
-                      max="8192"
-                      placeholder="1024"
-                      size="lg"
-                    />
+                  <UFormGroup label="Max Response Tokens" description="Limit the length of responses">
+                    <UInput v-model="maxTokens" type="number" min="10" max="8192" placeholder="1024" size="lg" />
                   </UFormGroup>
 
-                  <UFormGroup
-                    label="Creativity Level"
-                    :description="`Current: ${temperature} (${getCreativityLabel(temperature)})`"
-                  >
-                    <URange
-                      v-model="temperature"
-                      :min="0"
-                      :max="1"
-                      :step="0.1"
-                      size="lg"
-                    />
+                  <UFormGroup label="Creativity Level"
+                    :description="`Current: ${temperature} (${getCreativityLabel(temperature)})`">
+                    <URange v-model="temperature" :min="0" :max="1" :step="0.1" size="lg" />
                   </UFormGroup>
                 </div>
               </div>
@@ -149,13 +87,7 @@
             <UButton color="gray" variant="ghost" size="lg" @click="closeModal">
               Cancel
             </UButton>
-            <UButton
-              type="submit"
-              color="primary"
-              icon="i-heroicons-sparkles"
-              size="lg"
-              :loading="isCreating"
-            >
+            <UButton type="submit" color="primary" icon="i-heroicons-sparkles" size="lg" :loading="isCreating">
               Create Agent
             </UButton>
           </div>
@@ -215,13 +147,13 @@ const modelOptions = [
     tier: "latest",
   },
   {
-    value: "claude-4-sonnet-latest",
+    value: "claude-sonnet-4-20250514",
     name: "Claude 4 Sonnet",
     description: "Next-gen Sonnet for advanced tasks",
     tier: "latest",
   },
   {
-    value: "claude-4.1-opus-latest",
+    value: "claude-opus-4-1-20250805",
     name: "Claude 4.1 Opus",
     description: "Most capable Opus with cutting-edge performance",
     tier: "powerful",
