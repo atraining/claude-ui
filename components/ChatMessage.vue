@@ -22,7 +22,11 @@
           ]"
         >
           <UIcon
-            :name="message.role === 'user' ? 'i-heroicons-user' : 'i-heroicons-cpu-chip'"
+            :name="
+              message.role === 'user'
+                ? 'i-heroicons-user'
+                : 'i-heroicons-cpu-chip'
+            "
             class="w-3 h-3 lg:w-4 lg:h-4"
           />
         </div>
@@ -40,13 +44,24 @@
           ]"
         >
           <!-- Typing indicator for streaming messages -->
-          <div v-if="isStreaming && message.role === 'assistant'" class="flex items-center gap-2 mb-2">
+          <div
+            v-if="isStreaming && message.role === 'assistant'"
+            class="flex items-center gap-2 mb-2"
+          >
             <div class="flex gap-1">
-              <div class="w-2 h-2 bg-primary-500 rounded-full animate-pulse"></div>
-              <div class="w-2 h-2 bg-primary-500 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
-              <div class="w-2 h-2 bg-primary-500 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+              <div class="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
+              <div
+                class="w-2 h-2 bg-primary-500 rounded-full animate-pulse"
+                style="animation-delay: 0.2s"
+              />
+              <div
+                class="w-2 h-2 bg-primary-500 rounded-full animate-pulse"
+                style="animation-delay: 0.4s"
+              />
             </div>
-            <span class="text-xs text-gray-500 dark:text-gray-400">Claude is thinking...</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400"
+              >Claude is thinking...</span
+            >
           </div>
 
           <!-- Message content -->
@@ -74,8 +89,8 @@
           </span>
 
           <!-- Action buttons (visible on hover) -->
-          <div 
-            v-if="message.role === 'assistant'" 
+          <div
+            v-if="message.role === 'assistant'"
             class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
           >
             <UButton
@@ -83,16 +98,16 @@
               variant="ghost"
               color="gray"
               icon="i-heroicons-clipboard"
-              @click="copyToClipboard"
               class="hover:bg-gray-100 dark:hover:bg-gray-700"
+              @click="copyToClipboard"
             />
             <UButton
               size="xs"
               variant="ghost"
               color="gray"
               icon="i-heroicons-arrow-path"
-              @click="regenerateResponse"
               class="hover:bg-gray-100 dark:hover:bg-gray-700"
+              @click="regenerateResponse"
             />
           </div>
         </div>
@@ -120,11 +135,11 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['regenerate']);
+const emit = defineEmits(["regenerate"]);
 
 const relativeTime = computed(() => {
-  if (!props.message.createdAt) return 'now';
-  
+  if (!props.message.createdAt) return "now";
+
   const now = new Date();
   const createdAt = new Date(props.message.createdAt);
   const diffInSeconds = Math.floor((now - createdAt) / 1000);
@@ -172,6 +187,6 @@ const copyToClipboard = async () => {
 };
 
 const regenerateResponse = () => {
-  emit('regenerate', props.message);
+  emit("regenerate", props.message);
 };
 </script>

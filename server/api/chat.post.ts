@@ -8,7 +8,6 @@ import db from "~/server/utils/db";
 
 const MAX_MESSAGES = 4;
 
-
 function resolveAnthropicModel(model?: string): string {
   const fallback = "claude-3-5-sonnet-20241022";
   if (!model) return fallback;
@@ -20,10 +19,11 @@ export default defineEventHandler(async (event: H3Event) => {
     const session = await requireUserSession(event);
     const { anthropicKey } = useRuntimeConfig();
 
-    if (!anthropicKey || anthropicKey === 'your_anthropic_api_key_here') {
+    if (!anthropicKey || anthropicKey === "your_anthropic_api_key_here") {
       throw createError({
         statusCode: 500,
-        message: "Anthropic API key is not configured. Please set the ANTHROPIC_KEY environment variable.",
+        message:
+          "Anthropic API key is not configured. Please set the ANTHROPIC_KEY environment variable.",
       });
     }
 

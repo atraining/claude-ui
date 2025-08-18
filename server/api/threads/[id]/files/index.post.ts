@@ -11,10 +11,11 @@ export default defineEventHandler(async (event) => {
     // Get configuration and request body
     const { anthropicKey } = useRuntimeConfig();
 
-    if (!anthropicKey || anthropicKey === 'your_anthropic_api_key_here') {
+    if (!anthropicKey || anthropicKey === "your_anthropic_api_key_here") {
       throw createError({
         statusCode: 500,
-        message: "Anthropic API key is not configured. Please set the ANTHROPIC_KEY environment variable.",
+        message:
+          "Anthropic API key is not configured. Please set the ANTHROPIC_KEY environment variable.",
       });
     }
 

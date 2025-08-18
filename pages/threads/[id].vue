@@ -1,12 +1,13 @@
 <template>
-  <div class="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+  <div
+    class="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200"
+  >
     <Sidebar ref="sidebar" />
-    
-    <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
 
+    <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
       <!-- Messages List Component -->
-      <MessageList 
-        :messages="messages" 
+      <MessageList
+        :messages="messages"
         :is-streaming="isStreaming"
         @regenerate="handleRegenerate"
       />
@@ -20,7 +21,7 @@
 
     <!-- Modals -->
     <CreateThreadModal />
-    
+
     <!-- Delete Confirmation Modal -->
     <UModal v-model="confirmDelete">
       <UCard>
@@ -29,12 +30,15 @@
         </template>
         <template #default>
           <p class="text-gray-600 dark:text-gray-400">
-            Are you sure you want to delete "{{ currentThread?.name }}"? This action cannot be undone.
+            Are you sure you want to delete "{{ currentThread?.name }}"? This
+            action cannot be undone.
           </p>
         </template>
         <template #footer>
           <div class="flex justify-end gap-2">
-            <UButton variant="ghost" @click="confirmDelete = false">Cancel</UButton>
+            <UButton variant="ghost" @click="confirmDelete = false"
+              >Cancel</UButton
+            >
             <UButton color="red" @click="deleteCurrentThread">Delete</UButton>
           </div>
         </template>
@@ -70,25 +74,25 @@ const selectedFiles = computed(() => {
 });
 
 const getModelColor = (model) => {
-  if (model?.includes('sonnet')) return 'bg-blue-500';
-  if (model?.includes('haiku')) return 'bg-green-500';
-  if (model?.includes('opus')) return 'bg-purple-500';
-  return 'bg-gray-500';
+  if (model?.includes("sonnet")) return "bg-blue-500";
+  if (model?.includes("haiku")) return "bg-green-500";
+  if (model?.includes("opus")) return "bg-purple-500";
+  return "bg-gray-500";
 };
 
 const getModelName = (model) => {
   const modelMap = {
-    'claude-3-5-sonnet-20241022': 'Claude 3.5 Sonnet',
-    'claude-3-5-haiku-20241022': 'Claude 3.5 Haiku',
-    'claude-3-opus-20240229': 'Claude 3 Opus',
-    'claude-3-sonnet-20240229': 'Claude 3 Sonnet',
-  'claude-3-haiku-20240307': 'Claude 3 Haiku',
-  // New models / aliases
-  'claude-3-7-sonnet-latest': 'Claude 3.7 Sonnet',
-  'claude-4-sonnet-latest': 'Claude 4 Sonnet',
-  'claude-4.1-opus-latest': 'Claude 4.1 Opus'
+    "claude-3-5-sonnet-20241022": "Claude 3.5 Sonnet",
+    "claude-3-5-haiku-20241022": "Claude 3.5 Haiku",
+    "claude-3-opus-20240229": "Claude 3 Opus",
+    "claude-3-sonnet-20240229": "Claude 3 Sonnet",
+    "claude-3-haiku-20240307": "Claude 3 Haiku",
+    // New models / aliases
+    "claude-3-7-sonnet-latest": "Claude 3.7 Sonnet",
+    "claude-4-sonnet-latest": "Claude 4 Sonnet",
+    "claude-4.1-opus-latest": "Claude 4.1 Opus",
   };
-  return modelMap[model] || model || 'Claude 3.5 Sonnet';
+  return modelMap[model] || model || "Claude 3.5 Sonnet";
 };
 
 // Load initial data
@@ -117,7 +121,7 @@ const handleSendMessage = async (messageText) => {
   // This is now handled in MessageInput component
   // Just need to track streaming state
   isStreaming.value = true;
-  
+
   // Listen for when streaming is complete
   // This could be improved with proper event handling
   const checkComplete = setInterval(() => {
@@ -130,16 +134,16 @@ const handleSendMessage = async (messageText) => {
 
 const handleRegenerate = async (message) => {
   // Find the message index
-  const messageIndex = messages.value.findIndex(m => m.id === message.id);
+  const messageIndex = messages.value.findIndex((m) => m.id === message.id);
   if (messageIndex === -1) return;
 
   // Find the user message before this assistant message
   const userMessage = messages.value[messageIndex - 1];
-  if (!userMessage || userMessage.role !== 'user') return;
+  if (!userMessage || userMessage.role !== "user") return;
 
   // Remove the assistant message
   messages.value.splice(messageIndex, 1);
-  
+
   // Resend the user message
   isStreaming.value = true;
   loader.value = true;
@@ -173,7 +177,7 @@ const handleRegenerate = async (message) => {
     // Handle streaming response
     const reader = response.body?.getReader();
     if (!reader) throw new Error("Response body is not readable");
-    
+
     const decoder = new TextDecoder();
 
     while (true) {
@@ -189,7 +193,7 @@ const handleRegenerate = async (message) => {
             const data = JSON.parse(line.slice(5));
             if (data.type === "content_block_delta" && data.delta?.text) {
               const lastMessage = messages.value[messages.value.length - 1];
-              if (lastMessage.role === 'assistant') {
+              if (lastMessage.role === "assistant") {
                 lastMessage.content += data.delta.text;
               }
             }
@@ -226,16 +230,16 @@ const deleteCurrentThread = async () => {
     await $fetch(`/api/threads/${route.params.id}`, {
       method: "DELETE",
     });
-    
+
     confirmDelete.value = false;
-    
+
     toast.add({
       title: "Agent deleted",
       description: "The AI agent has been removed",
       color: "green",
       icon: "i-heroicons-trash",
     });
-    
+
     await navigateTo("/");
   } catch (error) {
     console.error("Error deleting thread:", error);

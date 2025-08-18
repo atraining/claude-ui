@@ -1,10 +1,14 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div
+    class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+  >
     <div class="max-w-md w-full">
       <!-- Header -->
       <div class="text-center mb-8">
         <div class="flex justify-center mb-6">
-          <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center">
+          <div
+            class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center"
+          >
             <UIcon name="i-heroicons-sparkles" class="w-8 h-8 text-white" />
           </div>
         </div>
@@ -40,7 +44,7 @@
               required
             />
           </UFormGroup>
-          
+
           <UFormGroup label="Password" label-for="password">
             <UInput
               v-model="password"
@@ -98,7 +102,8 @@ const handleSubmit = async () => {
     console.error("Login failed", error);
     toast.add({
       title: "Sign in failed",
-      description: error.data?.message || error.message || "Invalid email or password",
+      description:
+        error.data?.message || error.message || "Invalid email or password",
       color: "red",
       icon: "i-heroicons-exclamation-triangle",
     });

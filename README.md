@@ -62,6 +62,7 @@ DATABASE_URL=./database.db
 ```
 
 **To get your Anthropic API key:**
+
 1. Visit [https://console.anthropic.com/](https://console.anthropic.com/)
 2. Sign up or log in to your account
 3. Navigate to API Keys section
@@ -69,11 +70,14 @@ DATABASE_URL=./database.db
 5. Copy the key and paste it in your `.env` file
 
 ## Parsing PDFs
+
 Ensure `poppler-utils` is part of your environment by installing it:
+
 ```bash
 sudo apt update
 sudo apt install poppler-utils
 ```
+
 ## ENV
 
 Create a .env file in the root directory and add your `ANTHROPIC_KEY` API key as shown above in the Setup section.

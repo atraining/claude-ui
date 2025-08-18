@@ -1,10 +1,14 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div
+    class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+  >
     <div class="max-w-md w-full">
       <!-- Header -->
       <div class="text-center mb-8">
         <div class="flex justify-center mb-6">
-          <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center">
+          <div
+            class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center"
+          >
             <UIcon name="i-heroicons-user-plus" class="w-8 h-8 text-white" />
           </div>
         </div>
@@ -40,9 +44,9 @@
               required
             />
           </UFormGroup>
-          
-          <UFormGroup 
-            label="Password" 
+
+          <UFormGroup
+            label="Password"
             label-for="password"
             help="Must be at least 6 characters long"
           >
@@ -64,7 +68,8 @@
       <!-- Terms and Privacy -->
       <div class="mt-6 text-center">
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          By creating an account, you agree to our Terms of Service and Privacy Policy
+          By creating an account, you agree to our Terms of Service and Privacy
+          Policy
         </p>
       </div>
 
@@ -96,7 +101,7 @@ const handleSubmit = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email.value, password: password.value }),
     });
-    
+
     if (res.ok) {
       toast.add({
         title: "Account created!",

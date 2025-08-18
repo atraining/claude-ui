@@ -1,19 +1,23 @@
 <template>
   <div class="shrink-0 bg-white dark:bg-gray-900">
     <!-- Input container -->
-    <div class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-2 lg:px-4 py-3 lg:py-4">
+    <div
+      class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-2 lg:px-4 py-3 lg:py-4"
+    >
       <div class="max-w-5xl lg:max-w-6xl mx-auto">
         <!-- File attachments -->
         <FileAttachments
           v-if="attachedFiles.length > 0"
           :files="attachedFiles"
-          @remove="removeFile"
           class="mb-3"
+          @remove="removeFile"
         />
-        
+
         <!-- Input Area -->
         <form class="relative" @submit.prevent="handleSendMessage">
-          <div class="flex items-end gap-3 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-3 transition-colors focus-within:border-primary-300 dark:focus-within:border-primary-600">
+          <div
+            class="flex items-end gap-3 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-3 transition-colors focus-within:border-primary-300 dark:focus-within:border-primary-600"
+          >
             <!-- File attachment button -->
             <UButton
               type="button"
@@ -22,8 +26,8 @@
               icon="i-heroicons-paper-clip"
               size="sm"
               :disabled="loader"
-              @click="triggerFileInput"
               class="mb-1"
+              @click="triggerFileInput"
             />
 
             <!-- Text input -->
@@ -50,15 +54,21 @@
             />
           </div>
 
-          
-
           <!-- Input hints -->
-          <div class="flex items-center justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <div
+            class="flex items-center justify-between mt-2 text-xs text-gray-500 dark:text-gray-400"
+          >
             <div class="flex items-center gap-4">
               <span>Press Shift+Enter for new line</span>
-              <span v-if="selectedFiles.length > 0" class="flex items-center gap-1">
+              <span
+                v-if="selectedFiles.length > 0"
+                class="flex items-center gap-1"
+              >
                 <UIcon name="i-heroicons-paper-clip" class="w-3 h-3" />
-                {{ selectedFiles.length }} file{{ selectedFiles.length !== 1 ? 's' : '' }} attached
+                {{ selectedFiles.length }} file{{
+                  selectedFiles.length !== 1 ? "s" : ""
+                }}
+                attached
               </span>
             </div>
             <div class="flex items-center gap-1">
@@ -106,9 +116,9 @@ const fileInput = ref(null);
 // Quick suggestion prompts
 const quickSuggestions = ref([
   "Explain this concept",
-  "Write a summary", 
+  "Write a summary",
   "Help me debug this",
-  "What are the best practices?"
+  "What are the best practices?",
 ]);
 
 const selectedFiles = computed(() => {
@@ -123,7 +133,7 @@ const triggerFileInput = () => {
 
 const handleKeyDown = (event) => {
   // Send on Enter (but not Shift+Enter)
-  if (event.key === 'Enter' && !event.shiftKey) {
+  if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
     handleSendMessage();
   }
@@ -150,7 +160,7 @@ const handleFileSelect = async (event) => {
 
       const formData = new FormData();
       formData.append("file", file);
-      
+
       const fileReq = await $fetch(`/api/threads/${route.params.id}/files`, {
         method: "post",
         body: formData,
@@ -165,7 +175,7 @@ const handleFileSelect = async (event) => {
       };
 
       emit("update:attachedFiles", [...props.attachedFiles, newFile]);
-      
+
       toast.add({
         title: "File uploaded",
         description: `${file.name} has been processed`,
@@ -197,7 +207,7 @@ const removeFile = async (fileToRemove) => {
       "update:attachedFiles",
       props.attachedFiles.filter((file) => file !== fileToRemove),
     );
-    
+
     toast.add({
       title: "File removed",
       description: `${fileToRemove.name} has been removed`,
@@ -207,7 +217,7 @@ const removeFile = async (fileToRemove) => {
   } catch (error) {
     console.error("Error removing file:", error);
     toast.add({
-      title: "Remove failed", 
+      title: "Remove failed",
       description: "Could not remove file",
       color: "red",
       icon: "i-heroicons-exclamation-triangle",
@@ -275,7 +285,7 @@ const handleSendMessage = async () => {
     if (!reader) {
       throw new Error("Response body is not readable");
     }
-    
+
     const decoder = new TextDecoder();
 
     try {
@@ -293,7 +303,7 @@ const handleSendMessage = async () => {
               if (data.type === "content_block_delta" && data.delta?.text) {
                 // Update the last message with the new content
                 const lastMessage = messages.value[messages.value.length - 1];
-                if (lastMessage.role === 'assistant') {
+                if (lastMessage.role === "assistant") {
                   lastMessage.content += data.delta.text;
                 }
                 // Small delay to allow UI updates
