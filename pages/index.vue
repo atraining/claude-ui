@@ -6,9 +6,6 @@
       <div class="max-w-2xl mx-auto text-center">
         <!-- Welcome Section -->
         <div class="mb-8">
-          <div class="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <UIcon name="i-heroicons-sparkles" class="w-10 h-10 text-white" />
-          </div>
           <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Welcome to Claude UI
           </h1>
@@ -76,31 +73,6 @@
             <h4 class="font-medium text-gray-900 dark:text-white mb-1">Real-time Streaming</h4>
             <p class="text-sm text-gray-600 dark:text-gray-400">See responses as they're generated</p>
           </div>
-        </div>
-
-        <!-- Get Started Button -->
-        <UButton 
-          size="lg" 
-          color="primary" 
-          icon="i-heroicons-rocket-launch"
-          @click="openModal"
-          class="px-8"
-        >
-          Get Started
-        </UButton>
-
-        <!-- Quick Tips -->
-        <div class="mt-12 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-          <h4 class="font-medium text-blue-900 dark:text-blue-100 mb-3 flex items-center gap-2">
-            <UIcon name="i-heroicons-light-bulb" class="w-4 h-4" />
-            Pro Tips
-          </h4>
-          <ul class="text-sm text-blue-800 dark:text-blue-200 space-y-2 text-left">
-            <li>• Use different models for different tasks: Sonnet for complex work, Haiku for speed</li>
-            <li>• Adjust creativity (temperature) to control response randomness</li>
-            <li>• Upload relevant documents to give your agent more context</li>
-            <li>• Set clear, specific system instructions for better results</li>
-          </ul>
         </div>
       </div>
     </div>
