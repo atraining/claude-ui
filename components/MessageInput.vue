@@ -87,7 +87,7 @@
           multiple
           class="hidden"
           @change="handleFileSelect"
-        />
+        >
       </div>
     </div>
   </div>

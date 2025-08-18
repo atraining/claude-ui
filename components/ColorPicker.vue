@@ -31,7 +31,7 @@
           />
         </div>
 
-        <hr class="border-gray-200 dark:border-gray-800 my-2" />
+        <hr class="border-gray-200 dark:border-gray-800 my-2" >
 
         <div class="grid grid-cols-5 gap-px">
           <ColorPickerPill
