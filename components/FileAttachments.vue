@@ -52,11 +52,20 @@
                 {{ getFileSize(file.file?.size) }}
               </span>
             </div>
+
+            <!-- Processing indicator for this specific file -->
+            <div
+              v-if="processingFileName === file.name && processingMessage"
+              class="flex items-center gap-2 mt-2 text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 rounded-lg px-2 py-1"
+            >
+              <UIcon name="i-heroicons-sparkles" class="w-3 h-3 animate-pulse" />
+              <span>{{ processingMessage }}</span>
+            </div>
           </div>
 
-          <!-- Remove button -->
+          <!-- Remove button or processing spinner -->
           <UButton
-            :loading="loader"
+            v-if="processingFileName !== file.name || !processingMessage"
             size="xs"
             color="gray"
             variant="ghost"
@@ -64,6 +73,12 @@
             class="opacity-0 group-hover:opacity-100 transition-opacity"
             @click="handleRemoveFile(file)"
           />
+          <div
+            v-else
+            class="flex items-center justify-center w-6 h-6"
+          >
+            <UIcon name="i-heroicons-arrow-path" class="w-4 h-4 animate-spin text-primary-500" />
+          </div>
         </div>
       </div>
     </div>
@@ -88,12 +103,18 @@
 <script setup>
 import { computed } from "vue";
 
-const { loader } = useLoader();
-
 const props = defineProps({
   files: {
     type: Array,
     required: true,
+  },
+  processingFileName: {
+    type: String,
+    default: "",
+  },
+  processingMessage: {
+    type: String,
+    default: "",
   },
 });
 

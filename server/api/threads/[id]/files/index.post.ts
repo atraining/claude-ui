@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
     for (const field of formData) {
       if (!field.data || !field.filename) continue;
 
-      const text = await parseFile(field.filename, field.data, field.type);
+      const text = await parseFile(field.filename, field.data, field.type, anthropicKey);
 
       const tokens = await anthropic.beta.messages.countTokens({
         model: "claude-3-5-sonnet-20241022",
