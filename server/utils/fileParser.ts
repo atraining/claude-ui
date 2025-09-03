@@ -59,7 +59,7 @@ export async function parseFile(
   filename: string,
   buffer: Buffer,
   mimeType?: string,
-  anthropicApiKey?: string,
+  model: string,
 ): Promise<string> {
   try {
     const ext = filename.split(".").pop()?.toLowerCase();
@@ -79,11 +79,7 @@ export async function parseFile(
       (ext && CLAUDE_SUPPORTED_EXTENSIONS.has(ext)) ||
       (mimeType && CLAUDE_SUPPORTED_MIMETYPES.has(mimeType))
     ) {
-      if (!anthropicApiKey) {
-        throw new Error("Anthropic API key is required for processing this file type");
-      }
-
-      return await extractTextWithClaude(filename, buffer, mimeType, anthropicApiKey);
+      return await extractTextWithClaude(filename, buffer, mimeType, model);
     }
 
     // Fallback to plain text for unsupported types
@@ -108,15 +104,17 @@ async function extractTextWithClaude(
   filename: string,
   buffer: Buffer,
   mimeType?: string,
-  anthropicApiKey: string,
+  model: string,
 ): Promise<string> {
+  // Get the API key from runtime config
+  const { anthropicKey } = useRuntimeConfig();
   // Validate file size (Claude has limits)
   const maxFileSize = 32 * 1024 * 1024; // 32MB limit
   if (buffer.length > maxFileSize) {
     throw new Error(`File too large: ${Math.round(buffer.length / (1024 * 1024))}MB. Maximum size is 32MB.`);
   }
 
-  const anthropic = getClaudeInstance(anthropicApiKey);
+  const anthropic = getClaudeInstance(anthropicKey);
 
   // Determine if this is an image file
   const isImage = mimeType?.startsWith("image/") || 
@@ -157,7 +155,7 @@ async function extractTextWithClaude(
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: model,
       max_tokens: 8192, // Increased for larger documents
       temperature: 0, // Deterministic for text extraction
       messages: [
