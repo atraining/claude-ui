@@ -24,7 +24,7 @@
         ]"
       >
         <div class="flex items-start gap-3">
-          <UCheckbox v-model="file.selected" size="sm" class="mt-0.5" />
+          <UCheckbox v-model="file.selected" class="mt-0.5" />
 
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-1">
@@ -118,7 +118,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["remove-file"]);
+const emit = defineEmits(["remove"]);
 
 const selectedCount = computed(() => {
   return props.files.filter((file) => file.selected).length;
@@ -170,6 +170,6 @@ const getFileSize = (bytes) => {
 };
 
 const handleRemoveFile = (file) => {
-  emit("remove-file", file);
+  emit("remove", file);
 };
 </script>
